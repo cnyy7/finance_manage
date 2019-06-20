@@ -20,11 +20,11 @@ const app = express()
 app.use(history())
 
 // uncomment after placing your favicon in /public
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'))
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const compiler = webpack(config)
 //webpack 中间件
@@ -33,9 +33,10 @@ app.use(webpackDevMiddleware(compiler, {
   stats: { colors: true }
 }))
 
-app.use(webpackHotMiddleware(compiler))
+app.use(webpackHotMiddleware(compiler));
 
-app.use(express.static(path.join(__dirname, 'views')))
+app.use(express.static(path.join(__dirname, 'views')));
+app.use('/static', express.static('src/client/static'));
 app.get('/', function (req, res) {
   res.sendFile('./views/index.html')
 })
