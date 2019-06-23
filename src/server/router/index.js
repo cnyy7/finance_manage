@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import home from '@/components/Home'
+import home from '@/components/Login'
 import product from '@/components/product'
 import strategy from '@/components/strategy'
 import forms from '@/components/forms'
