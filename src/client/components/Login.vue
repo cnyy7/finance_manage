@@ -1,108 +1,82 @@
 <template>
-<div id="bg" class="bg">
-  <div class="login" @keyup.13="doLogin">
-    <div class="form-horizontal login">
-      <div class="logo">My-Albums</div>
-      <div class="form-group input-group input-group-lg ">
-        <span class="input-group-addon"><i class="fa fa-user-o" aria-hidden="true"></i></span>
-        <input type="text" class=" form-control" placeholder="username" v-model="userInfo.userName">
-      </div>
-      <div class="form-group input-group input-group-lg">
-        <span class="input-group-addon"><i class="fa fa-key" aria-hidden="true"></i></span>
-        <input type="password" class=" form-control" placeholder="password" v-model="userInfo.password">
-      </div>
-      <div class="form-group">
-        <el-button class="form-control" @click="doLogin">登 录</el-button>
-        <!--<button class="btn btn-default btn-sm form-control login-btn" @click="doLogin">登 录</button>-->
-      </div>
-    </div>
-  </div>
-</div>
+    <el-form ref="AccountFrom" :model="account" :rules="rules" label-position="left" label-width="0px"
+             class="demo-ruleForm login-container">
+        <h3 class="title">请登录{{project_name}}</h3>
+        <el-form-item prop="username">
+            <el-input type="text" v-model="account.username" auto-complete="off" placeholder="账号"></el-input>
+        </el-form-item>
+        <el-form-item prop="pwd">
+            <el-input type="password" v-model="account.pwd" auto-complete="off" placeholder="密码"></el-input>
+        </el-form-item>
+        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false" ref="Verify"></Verify>
+<!--        <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
+        <el-form-item style="width:100%;margin-top: 5px">
+            <el-button @click="checkCode()" type="primary" style="width:100%;" >登录</el-button>
+        </el-form-item>
+    </el-form>
 </template>
 
 <script>
-  import axios from 'axios';
-  export default {
-    name: 'login',
-    data () {
-      return {
-        userInfo :{
-          userName : '',
-          password : '',
+    import Verify from 'vue2-verify'
+
+    export default {
+        name: 'login',
+        data () {
+            return  {
+                project_name:'财务管理系统',
+                logining: false,
+                account: {
+                    username: '',
+                    pwd: ''
+                },
+                rules: {
+                    username: [
+                        {required: true, message: '请输入账号', trigger: 'blur'},
+                    ],
+                    pwd: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                    ]
+                },
+                checked: true
+            };
         },
-        show : false,
-      }
-    },
-    methods : {
-      doLogin (){
-        if (this.userName == ''){
-          alert('用户名不能为空');
-          return false
+        methods: {
+            inputSuccess(text) {
+                console.log(text);
+                console.log('account.username: '+this.account.username);
+                console.log('account.pwd: '+this.account.pwd);
+                return false;
+            },
+            inputError(text) {
+                console.log(text);
+                console.log('account.username: '+this.account.username);
+                console.log('account.pwd: '+this.account.pwd);
+                return false;
+            },
+            checkCode(){
+                this.$refs.Verify.checkCode();
+            }
+        },
+        components: {
+            Verify
         }
-        if (this.password == ''){
-          alert('密码名不能为空');
-          return false
-        }
-        axios.post('/login',JSON.stringify(this.userInfo))
-                .then(res => {
-                  console.log(res)
-                  if(res.status == 200){
-                    this.$store.commit('setToken',res.data);
-                    localStorage.userName = this.userInfo.userName;
-                    localStorage.token_expire = res.data.expire;
-                    localStorage.token = res.data.token;
-                    this.$notify({
-                      title : '提示信息',
-                      message : '登录成功',
-                      type : 'success'
-                    });
-                    this.$router.push({path:'/'})
-                  }else {
-                    this.$notify({
-                      title : '提示信息',
-                      message : '账号或密码错误',
-                      type : 'error'
-                    });
-                  }
-                })
-                .catch(err => {
-                  console.log(err)
-                })
-      }
-    },
-    mounted (){
-      var wi=window.screen.width;
-      var hi=window.screen.height;
-      document.getElementById("bg").style.width=wi+"px";
-      document.getElementById("bg").style.height=hi+"px";
-    },
-  }
+    }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-  /*.bg {*/
-  /*!*background-color: aqua;*!*/
-  /*background-image: url("../assets/bj.jpg");*/
-  /*background-size:100% 100%*/
-  /*}*/
-  .login {
-    position:absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    -o-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    width: 400px;
-  }
-  .login-btn {
-    background-color: whitesmoke;
-  }
-  .logo {
-    font-family: "DejaVu Sans Mono";
-    color: lightblue;
-    font-size: 50px;
-  }
+
+<style>
+    body{
+        background: #DFE9FB;
+    }
+    .login-container{
+        width:350px;
+        height: 100%;
+        margin-top: 10%;
+        margin-left: auto;
+        margin-right: auto;
+
+    }
+    .title{
+        text-align: center;
+    }
 </style>

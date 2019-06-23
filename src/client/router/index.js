@@ -10,6 +10,7 @@ import Login from "../components/Login";
 import strategy from "../components/strategy";
 import product from "../components/product";
 import forms from "../components/forms";
+import Home from "../components/Home";
 import App from "../App";
 
 Vue.use(Router);
@@ -18,6 +19,10 @@ var router = new Router({
     mode: 'history',
     routes: [
         {
+            name: '/',
+            path: 'index',
+            component: App
+        },{
             name: 'hello',
             path: '/hello',
             component: Hello
@@ -28,9 +33,9 @@ var router = new Router({
             component: Login
         },
         {
-            path: '/',
-            name: '管理系统',
-            component: App,
+            path: '/home',
+            name: 'home',
+            component: Home,
             meta: {
                 requireAuth: true,
             },
