@@ -11,6 +11,7 @@ import strategy from "../components/strategy";
 import product from "../components/product";
 import forms from "../components/forms";
 import Home from "../components/Home";
+import Register from "../components/Register";
 import App from "../App";
 
 Vue.use(Router);
@@ -20,7 +21,10 @@ var router = new Router({
     routes: [
         {
             name: '/',
-            path: 'index',
+            path: '/',
+            meta: {
+                requireAuth: true,
+            },
             component: App
         },{
             name: 'hello',
@@ -33,8 +37,13 @@ var router = new Router({
             component: Login
         },
         {
-            path: '/home',
+            name: 'register',
+            path: '/register',
+            component:Register
+        },
+        {
             name: 'home',
+            path: '/home',
             component: Home,
             meta: {
                 requireAuth: true,
@@ -64,7 +73,6 @@ var router = new Router({
                         requireAuth: true,
                     },
                 },
-                // { path: '/user', component: user, name: '列表' },
             ]
         }
     ]
