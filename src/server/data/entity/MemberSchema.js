@@ -30,8 +30,18 @@ module.exports = new EntitySchema({
             type: 'many-to-one',
             target: 'Account',
             joinColumn: true,
-            nullable:false,
+            nullable: false,
             inverseSide: 'members',
-        }
+        },
+        savings: {
+            type: 'one-to-many',
+            target: 'Saving',
+            inverseSide: 'member',
+        },
+        balances: {
+            type: 'one-to-many',
+            target: 'Balance',
+            inverseSide: 'member',
+        },
     }
 });

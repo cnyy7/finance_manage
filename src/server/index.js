@@ -7,7 +7,7 @@ import webpack from 'webpack'
 import "reflect-metadata";
 // 引入history模块
 import history from 'connect-history-api-fallback'
-import {Account, Member} from './data/model/Models'
+import {Account, Member, Saving} from './data/model/Models'
 
 import {createConnection, getRepository} from 'typeorm'
 
@@ -24,19 +24,36 @@ createConnection({
     username: 'root', // 数据库用户名
     password: 'NLP666', // 密码
     database: 'finance', // 数据库名
-    entities: [require("./data/entity/AccountSchema"), require("./data/entity/MemberSchema")], // 引入实体
+    entities: [
+        require("./data/entity/AccountSchema"),
+        require("./data/entity/MemberSchema"),
+        require("./data/entity/SavingSchema"),
+    ], // 引入实体
     synchronize: true,
 })
     .then(async (connection) => {
         // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
-        const accountRepository=getRepository(Account);
-        const memberRepository=getRepository(Member);
+        const AccountRepository = getRepository(Account);
+        const MemberRepository = getRepository(Member);
+        const SavingRepository = getRepository(Saving);
         // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
-        let account = await accountRepository.find({ where: { name: "fafsddsdsssdfas"},relations:["members"] });
-        console.log('account:' + JSON.stringify(account));
-        let member = await memberRepository.find({where:{name:'fasaffdssdad1'},relations:["account"] });
-        console.log('member:' + JSON.stringify(member));
-        console.log(__dirname + '/data/entity/*.js');
+        let account = await AccountRepository.find({
+            where: {name: "fafsddsdsssdfas"},
+            relations: ["members"]
+        });
+        console.log('account:' + JSON.stringify(account, null, 2));
+        let member = await MemberRepository.find({
+            where: {name: 'fasaffdssdad1'},
+            relations: ["account", "savings"]
+        });
+        console.log('member:' + JSON.stringify(member, null, 2));
+        let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
+        // let newsaving = await SavingRepository.save(saving);
+        let newsaving = await SavingRepository.find({
+            where: {bankName: 'fads'},
+            relations: ["account", "member"]
+        });
+        console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
         console.log('数据库连接成功');
         return true
     })

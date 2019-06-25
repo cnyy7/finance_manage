@@ -25,6 +25,12 @@ module.exports = new EntitySchema({
             type: 'one-to-many',
             target: 'Member',
             inverseSide: 'account',
+            // cascade: true,
+        },
+        savings: {
+            type: 'one-to-many',
+            target: 'Saving',
+            inverseSide: 'account',
         },
     },
 });
