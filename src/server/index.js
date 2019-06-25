@@ -7,9 +7,9 @@ import webpack from 'webpack'
 import "reflect-metadata";
 // 引入history模块
 import history from 'connect-history-api-fallback'
-import {Account} from './data/model/Account'
+import {Account, Member} from './data/model/Models'
 
-import {createConnection} from 'typeorm'
+import {createConnection, getRepository} from 'typeorm'
 
 // 正式环境时，下面两个模块不需要引入
 import webpackDevMiddleware from 'webpack-dev-middleware'
@@ -24,19 +24,18 @@ createConnection({
     username: 'root', // 数据库用户名
     password: 'NLP666', // 密码
     database: 'finance', // 数据库名
-    entities: [require("./data/entity/AccountSchema"),], // 引入实体
+    entities: [require("./data/entity/AccountSchema"), require("./data/entity/MemberSchema")], // 引入实体
     synchronize: true,
 })
-    .then((connection) => {
-        let account = new Account('fadfas', 'fasd', 'adsf');
-        connection.manager.save(account)
-                  .then((u) => {
-                          console.log('保存成功:' + u.userId);
-                      }
-                  )
-                  .catch((err) => {
-                      console.log('保存失败:' + err);
-                  });
+    .then(async (connection) => {
+        // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
+        const accountRepository=getRepository(Account);
+        const memberRepository=getRepository(Member);
+        // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
+        let account = await accountRepository.find({ where: { name: "fafsddsdsssdfas"},relations:["members"] });
+        console.log('account:' + JSON.stringify(account));
+        let member = await memberRepository.find({where:{name:'fasaffdssdad1'},relations:["account"] });
+        console.log('member:' + JSON.stringify(member));
         console.log(__dirname + '/data/entity/*.js');
         console.log('数据库连接成功');
         return true

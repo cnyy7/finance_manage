@@ -1,32 +1,30 @@
 const EntitySchema = require("typeorm").EntitySchema;
-const Account = require("../model/Account").Account;
+const Account = require("../model/Models").Account;
 module.exports = new EntitySchema({
     name: "Account",
     target: Account,
     columns: {
-        userId: {
+        id: {
             primary: true,
             type: "int",
             generated: true
         },
-        username: {
+        name: {
             type: "varchar",
             unique: true,
         },
         pwd: {
             type: "varchar",
         },
-        userType: {
+        type: {
             type: "varchar",
         },
-    }
-    ,
-    // relations: {
-    //     categories: {
-    //         target: "Category",
-    //         type: "many-to-many",
-    //         joinTable: true,
-    //         cascade: true
-    //     }
-    // }
+    },
+    relations: {
+        members: {
+            type: 'one-to-many',
+            target: 'Member',
+            inverseSide: 'account',
+        },
+    },
 });
