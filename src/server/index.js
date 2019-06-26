@@ -18,7 +18,6 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 
 import config from '../../build/webpack.dev.conf'
-import {stringify} from "nodemon";
 
 function toJSON(data = {}, message = '', status = '', code = '') {
     return Object(JSON.stringify({
@@ -46,41 +45,40 @@ createConnection({
         require("./data/entity/FinanceSchema"),
     ], // 引入实体
     synchronize: true,
-})
-    .then(async (connection) => {
-        // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
-        AccountRepository = getRepository(Account);
-        MemberRepository = getRepository(Member);
-        SavingRepository = getRepository(Saving);
-        BalanceRepository = getRepository(Balance);
-        BorrowingRepository = getRepository(Borrowing);
-        FinanceRepository = getRepository(Finance);
-        // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
-        let account = await AccountRepository.find({
-            where: {name: "fafsddsdsssdfas"},
-            relations: ["members"]
-        });
-        console.log('account:' + JSON.stringify(account, null, 2));
-        let member = await MemberRepository.find({
-            where: {name: 'fasaffdssdad1'},
-            relations: ["account", "savings"]
-        });
-        console.log('member:' + JSON.stringify(member, null, 2));
-        let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
-        // let newsaving = await SavingRepository.save(saving);
-        let newsaving = await SavingRepository.find({
-            where: {bankName: 'fads'},
-            relations: ["member"]
-        });
-        console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
-        console.log('数据库连接成功');
-        return true
-    })
-    .catch((error) => {
-        console.log('应用启动失败');
-        console.log(error);
-        return false
+}).then(async (connection) => {
+    // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
+    AccountRepository = getRepository(Account);
+    MemberRepository = getRepository(Member);
+    SavingRepository = getRepository(Saving);
+    BalanceRepository = getRepository(Balance);
+    BorrowingRepository = getRepository(Borrowing);
+    FinanceRepository = getRepository(Finance);
+    // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
+    let account = await AccountRepository.find({
+        where: {name: "fafsddsdsssdfas"},
+        relations: ["members"]
     });
+    console.log('account:' + JSON.stringify(account, null, 2));
+    let member = await MemberRepository.find({
+        where: {name: 'fasaffdssdad1'},
+        relations: ["account", "savings"]
+    });
+    console.log('member:' + JSON.stringify(member, null, 2));
+    let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
+    // let newsaving = await SavingRepository.save(saving);
+    let newsaving = await SavingRepository.find({
+        where: {bankName: 'fads'},
+        relations: ["member"]
+    });
+    console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
+    console.log('数据库连接成功');
+    return true
+})
+  .catch((error) => {
+      console.log('应用启动失败');
+      console.log(error);
+      return false
+  });
 
 const app = express();
 

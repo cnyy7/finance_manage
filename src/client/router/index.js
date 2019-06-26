@@ -20,12 +20,12 @@ var router = new Router({
     mode: 'history',
     routes: [
         {
-            name: '/',
+            name: '',
             path: '/',
             meta: {
                 requireAuth: true,
             },
-            component: App
+            component: Home
         },{
             name: 'hello',
             path: '/hello',
