@@ -5,7 +5,7 @@ import product from '@/components/product'
 import strategy from '@/components/strategy'
 import forms from '@/components/forms'
 
-Vue.use(Router)
+Vue.use(Router);
 
 const router = new Router({
   routes:[
