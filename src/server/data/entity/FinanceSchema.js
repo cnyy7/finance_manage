@@ -1,23 +1,22 @@
 const EntitySchema = require("typeorm").EntitySchema;
-const Saving = require("../model/Models").Saving;
+const Finance = require("../model/Models").Finance;
 module.exports = new EntitySchema({
-    name: "Saving",
-    target: Saving,
+    name: "Finance",
+    target: Finance,
     columns: {
         id: {
             primary: true,
             type: "int",
             generated: true
         },
-        bankName: {
+        name: {
             type: "varchar",
         },
-        cardNumber: {
+        type: {
             type: "varchar",
-            unique: true,
         },
-        phone: {
-            type: "varchar",
+        money: {
+            type: "double",
         },
         beginTime: {
             type: "datetime",
@@ -25,6 +24,10 @@ module.exports = new EntitySchema({
         updateTime: {
             type: "datetime",
         },
+        memos: {
+            type: "text",
+            nullable: true,
+        }
     },
     relations: {
         member: {
@@ -32,14 +35,7 @@ module.exports = new EntitySchema({
             target: 'Member',
             joinColumn: true,
             nullable: false,
-            inverseSide: 'savings',
-        },
-        // account: {
-        //     type: 'many-to-one',
-        //     target: 'Account',
-        //     joinColumn: true,
-        //     nullable: false,
-        //     inverseSide: 'savings',
-        // }
+            inverseSide: 'finances',
+        }
     },
 });

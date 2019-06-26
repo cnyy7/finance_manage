@@ -43,5 +43,15 @@ module.exports = new EntitySchema({
             target: 'Balance',
             inverseSide: 'member',
         },
+        borrowings: {
+            type: 'one-to-many',
+            target: 'Borrowing',
+            inverseSide: 'member',
+        },
+        finances: {
+            type: 'one-to-many',
+            target: 'Finance',
+            inverseSide: 'member',
+        },
     }
 });
