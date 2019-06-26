@@ -80,8 +80,23 @@
                     if (valid) {
 
                         this.logining = true;
-                        var loginParams = { username: this.account.username, password: this.account.pwd };
-
+                        var registerParams = { name: this.account.username, pwd: this.account.pwd };
+                        this.$axios.post('/api/register',registerParams).then((data)=>{
+                            alert(JSON.stringify(data,null,2));
+                            console.log(JSON.stringify(data,null,2));
+                            // this.$router.replace('/home');
+                            if (data.status===200)
+                            {
+                                this.$router.push('/login');
+                                return true;
+                            }else{
+                                alert("用户名已被使用，请重新输入");
+                                this.logining=false;
+                                this.$refs.RegisterFrom.resetFields();
+                                this.$refs.VerifyRegister.refresh();
+                                return false;
+                            }
+                        })
                     } else {
                         alert('error submit!!');
                         console.log('error submit!!');

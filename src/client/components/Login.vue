@@ -19,7 +19,6 @@
 
 <script>
     import Verify from 'vue2-verify'
-
     export default {
         name: 'login',
         data () {
@@ -47,15 +46,32 @@
                     if (valid) {
 
                         this.logining = true;
-                        var loginParams = { username: this.account.username, password: this.account.pwd };
+                        var loginParams = { name: this.account.username, pwd: this.account.pwd };
                         alert('1username: '+this.account.username+'\npwd: '+this.account.pwd);
-
+                        this.$axios.post('/api/login',loginParams).then((data)=>{
+                            alert(JSON.stringify(data,null,2));
+                            console.log(JSON.stringify(data,null,2));
+                            // this.$router.replace('/home');
+                            if (data.status===200)
+                            {
+                                this.$store.commit('setLogin',true);
+                                this.$store.commit('setAccount',data.data);
+                                this.$router.push('/home');
+                                return true;
+                            }else{
+                                alert("用户名或密码错误");
+                                this.logining=false;
+                                this.$refs.LoginFrom.resetFields();
+                                this.$refs.Verify.refresh();
+                                return false;
+                            }
+                        })
                     } else {
                         console.log('error submit!!');
                         return false;
                     }
                 });
-                alert('account.username: '+this.account.username+'\naccount.pwd: '+this.account.pwd);
+                // alert('account.username: '+this.account.username+'\naccount.pwd: '+this.account.pwd);
                 console.log(text);
                 console.log('account.username: '+this.account.username);
                 console.log('account.pwd: '+this.account.pwd);

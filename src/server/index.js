@@ -7,7 +7,7 @@ import webpack from 'webpack'
 import "reflect-metadata";
 // 引入history模块
 import history from 'connect-history-api-fallback'
-import {Account, Member, Saving} from './data/model/Models'
+import {Account, Member, Saving, Finance, Borrowing, Balance} from './data/model/Models'
 
 import {createConnection, getRepository} from 'typeorm'
 
@@ -16,7 +16,18 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 
 import config from '../../build/webpack.dev.conf'
+import {stringify} from "nodemon";
 
+function toJSON(data = {}, message = '', status = '', code = '') {
+    return Object(JSON.stringify({
+        data,
+        message,
+        status,
+        code
+    }))
+}
+
+var AccountRepository, MemberRepository, SavingRepository, BalanceRepository, BorrowingRepository, FinanceRepository;
 createConnection({
     type: 'mysql', // 数据库类型
     host: '127.0.0.1', // 数据库地址
@@ -28,14 +39,20 @@ createConnection({
         require("./data/entity/AccountSchema"),
         require("./data/entity/MemberSchema"),
         require("./data/entity/SavingSchema"),
+        require("./data/entity/BalanceSchema"),
+        require("./data/entity/BorrowingSchema"),
+        require("./data/entity/FinanceSchema"),
     ], // 引入实体
     synchronize: true,
 })
     .then(async (connection) => {
         // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
-        const AccountRepository = getRepository(Account);
-        const MemberRepository = getRepository(Member);
-        const SavingRepository = getRepository(Saving);
+        AccountRepository = getRepository(Account);
+        MemberRepository = getRepository(Member);
+        SavingRepository = getRepository(Saving);
+        BalanceRepository = getRepository(Balance);
+        BorrowingRepository = getRepository(Borrowing);
+        FinanceRepository = getRepository(Finance);
         // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
         let account = await AccountRepository.find({
             where: {name: "fafsddsdsssdfas"},
@@ -51,7 +68,7 @@ createConnection({
         // let newsaving = await SavingRepository.save(saving);
         let newsaving = await SavingRepository.find({
             where: {bankName: 'fads'},
-            relations: ["account", "member"]
+            relations: ["member"]
         });
         console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
         console.log('数据库连接成功');
@@ -62,6 +79,7 @@ createConnection({
         console.log(error);
         return false
     });
+
 const app = express();
 
 // 引入history模式让浏览器进行前端路由页面跳转
@@ -88,6 +106,30 @@ app.use('/static', express.static('src/client/static'));
 app.use('/static', express.static('src/server/static'));
 app.get('/', function (req, res) {
     res.sendFile('./views/index.html')
+});
+
+app.post('/api/login', async function (req, res) {
+    let account = await AccountRepository.find({
+        where: {name: req.body.name},
+        relations: ["members"]
+    });
+    if (account.pwd===req.body.pwd) {
+        res.json(account[0]);
+    } else {
+        res.status(203).end();
+    }
+    // res.json(toJSON(account, 'success'));
+});
+
+app.post('/api/register', async function (req, res) {
+    let account=new Account(req.body.name,req.body.pwd,'normal');
+    AccountRepository.save(account).then(()=>{
+        res.status(200).end();
+    }).catch((err)=>{
+        console.log('error ==> '+err);
+        res.status(203).end();
+    });
+    // res.json(toJSON(account, 'success'));
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

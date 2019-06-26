@@ -13,7 +13,7 @@
                             <el-dropdown-item>删除</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
-                    <span>{{username}}</span>
+                    <span>{{username}} + {{account.id}}</span>
                 </el-col>
             </el-header>
             <el-container>
@@ -69,22 +69,30 @@
             handleSelect(key, keyPath) {
                 switch (key) {
                     case '1-1':
-                        this.$router.push('/product');
+                        this.$router.push('/home/product');
                         break;
                     case '1-2':
-                        this.$router.push('/forms');
+                        this.$router.push('/home/forms');
                         break;
                     case '2-1':
-                        this.$router.push('/strategy');
+                        this.$router.push('/home/strategy');
                         break;
                 }
             },
         },
+        computed:{
+            account(){
+                return this.$store.state.account;
+            }
+        }
     }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    body{
+        background: white;
+    }
     .con_section {
         position: absolute;
         top: 0px;
