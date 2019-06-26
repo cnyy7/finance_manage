@@ -3,27 +3,32 @@
              class="demo-ruleForm login-container">
         <h3 class="title">请登录{{project_name}}</h3>
         <el-form-item prop="username">
-            <el-input type="text" v-model="account.username" auto-complete="off" placeholder="账号" prefix-icon="el-icon-user" clearable></el-input>
+            <el-input type="text" v-model="account.username" auto-complete="off" placeholder="账号"
+                      prefix-icon="el-icon-user" clearable></el-input>
         </el-form-item>
         <el-form-item prop="pwd">
-            <el-input type="password" v-model="account.pwd" auto-complete="off" placeholder="密码" prefix-icon="el-icon-lock" clearable show-password></el-input>
+            <el-input type="password" v-model="account.pwd" auto-complete="off" placeholder="密码"
+                      prefix-icon="el-icon-lock" clearable show-password></el-input>
         </el-form-item>
-        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false" ref="Verify"></Verify>
-<!--        <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
+        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false"
+                ref="Verify"></Verify>
+        <!--        <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
         <el-form-item>
             <el-button @click="checkCode()" type="primary" style="width:100%;" :loading="logining">登录</el-button>
         </el-form-item>
-        <el-link href="/register" ><strong>没有账号？点此注册</strong><i class="el-icon-document el-icon--right"></i> </el-link>
+        <el-link href="/register"><strong>没有账号？点此注册</strong><i class="el-icon-document el-icon--right"></i></el-link>
     </el-form>
 </template>
 
 <script>
     import Verify from 'vue2-verify'
+    import sha256 from 'crypto-js/sha256';
+
     export default {
         name: 'login',
-        data () {
-            return  {
-                project_name:'财务管理系统',
+        data() {
+            return {
+                project_name: '财务管理系统',
                 logining: false,
                 account: {
                     username: '',
@@ -31,10 +36,18 @@
                 },
                 rules: {
                     username: [
-                        {required: true, message: '请输入账号', trigger: ['blur','change']},
+                        {
+                            required: true,
+                            message: '请输入账号',
+                            trigger: ['blur', 'change']
+                        },
                     ],
                     pwd: [
-                        {required: true, message: '请输入密码', trigger: ['blur','change']},
+                        {
+                            required: true,
+                            message: '请输入密码',
+                            trigger: ['blur', 'change']
+                        },
                     ]
                 },
                 checked: true
@@ -46,26 +59,31 @@
                     if (valid) {
 
                         this.logining = true;
-                        var loginParams = { name: this.account.username, pwd: this.account.pwd };
-                        alert('1username: '+this.account.username+'\npwd: '+this.account.pwd);
-                        this.$axios.post('/api/login',loginParams).then((data)=>{
-                            alert(JSON.stringify(data,null,2));
-                            console.log(JSON.stringify(data,null,2));
-                            // this.$router.replace('/home');
-                            if (data.status===200)
-                            {
-                                this.$store.commit('setLogin',true);
-                                this.$store.commit('setAccount',data.data);
-                                this.$router.push('/home');
-                                return true;
-                            }else{
-                                alert("用户名或密码错误");
-                                this.logining=false;
-                                this.$refs.LoginFrom.resetFields();
-                                this.$refs.Verify.refresh();
-                                return false;
-                            }
-                        })
+                        alert('1username: ' + this.account.username + '\npwd: ' + this.account.pwd);
+                        var pwd=sha256(this.account.pwd + '@Hi1Vssic7&kEIWb').toString();
+                        this.account.pwd = pwd.substring(0, 20);
+                        var loginParams = {
+                            name: this.account.username,
+                            pwd: pwd
+                        };
+                        this.$axios.post('/api/login', loginParams)
+                            .then((data) => {
+                                alert(JSON.stringify(data, null, 2));
+                                console.log(JSON.stringify(data, null, 2));
+                                // this.$router.replace('/home');
+                                if (data.status === 200) {
+                                    this.$store.commit('setLogin', true);
+                                    this.$store.commit('setAccount', data.data);
+                                    this.$router.push('/home');
+                                    return true;
+                                } else {
+                                    alert("用户名或密码错误");
+                                    this.logining = false;
+                                    this.$refs.LoginFrom.resetFields();
+                                    this.$refs.Verify.refresh();
+                                    return false;
+                                }
+                            })
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -73,18 +91,18 @@
                 });
                 // alert('account.username: '+this.account.username+'\naccount.pwd: '+this.account.pwd);
                 console.log(text);
-                console.log('account.username: '+this.account.username);
-                console.log('account.pwd: '+this.account.pwd);
+                console.log('account.username: ' + this.account.username);
+                console.log('account.pwd: ' + this.account.pwd);
                 return false;
             },
             inputError(text) {
                 alert("验证码错误！请重新输入");
                 console.log(text);
-                console.log('account.username: '+this.account.username);
-                console.log('account.pwd: '+this.account.pwd);
+                console.log('account.username: ' + this.account.username);
+                console.log('account.pwd: ' + this.account.pwd);
                 return false;
             },
-            checkCode(){
+            checkCode() {
                 this.$refs.Verify.checkCode();
             }
         },
@@ -96,20 +114,23 @@
 
 
 <style>
-    body{
+    body {
         background: #DFE9FB;
     }
-    .login-container{
-        width:350px;
+
+    .login-container {
+        width: 350px;
         height: 100%;
         margin-top: 10%;
         margin-left: auto;
         margin-right: auto;
 
     }
-    .title{
+
+    .title {
         text-align: center;
     }
+
     .el-form-item {
         width: 100%;
         margin-top: 17px;

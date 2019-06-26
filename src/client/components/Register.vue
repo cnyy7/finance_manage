@@ -27,6 +27,7 @@
 
 <script>
     import Verify from 'vue2-verify'
+    import sha256 from 'crypto-js/sha256';
 
     export default {
         name: 'register',
@@ -80,42 +81,49 @@
                     if (valid) {
 
                         this.logining = true;
-                        var registerParams = { name: this.account.username, pwd: this.account.pwd };
-                        this.$axios.post('/api/register',registerParams).then((data)=>{
-                            alert(JSON.stringify(data,null,2));
-                            console.log(JSON.stringify(data,null,2));
-                            // this.$router.replace('/home');
-                            if (data.status===200)
-                            {
-                                this.$router.push('/login');
-                                return true;
-                            }else{
-                                alert("用户名已被使用，请重新输入");
-                                this.logining=false;
-                                this.$refs.RegisterFrom.resetFields();
-                                this.$refs.VerifyRegister.refresh();
-                                return false;
-                            }
-                        })
+                        var pwd = sha256(this.account.pwd + '@Hi1Vssic7&kEIWb')
+                            .toString();
+                        this.account.pwd = pwd.substring(0, 20);
+                        this.account.pwd2 = pwd.substring(0, 20);
+                        var registerParams = {
+                            name: this.account.username,
+                            pwd: pwd
+                        };
+                        this.$axios.post('/api/register', registerParams)
+                            .then((data) => {
+                                alert(JSON.stringify(data, null, 2));
+                                console.log(JSON.stringify(data, null, 2));
+                                // this.$router.replace('/home');
+                                if (data.status === 200) {
+                                    this.$router.push('/login');
+                                    return true;
+                                } else {
+                                    alert("用户名已被使用，请重新输入");
+                                    this.logining = false;
+                                    this.$refs.RegisterFrom.resetFields();
+                                    this.$refs.VerifyRegister.refresh();
+                                    return false;
+                                }
+                            })
                     } else {
                         alert('error submit!!');
                         console.log('error submit!!');
                         return false;
                     }
                 });
-                alert('1username: '+this.account.username+'\npwd: '+this.account.pwd+'\npwd2: '+this.account.pwd2);
+                alert('1username: ' + this.account.username + '\npwd: ' + this.account.pwd + '\npwd2: ' + this.account.pwd2);
                 console.log(text);
-                console.log('account.username: '+this.account.username);
-                console.log('account.pwd: '+this.account.pwd);
-                console.log('account.pwd2: '+this.account.pwd2);
+                console.log('account.username: ' + this.account.username);
+                console.log('account.pwd: ' + this.account.pwd);
+                console.log('account.pwd2: ' + this.account.pwd2);
                 return false;
             },
             inputError(text) {
                 alert("验证码错误！请重新输入");
                 console.log(text);
-                console.log('account.username: '+this.account.username);
-                console.log('account.pwd: '+this.account.pwd);
-                console.log('account.pwd2: '+this.account.pwd2);
+                console.log('account.username: ' + this.account.username);
+                console.log('account.pwd: ' + this.account.pwd);
+                console.log('account.pwd2: ' + this.account.pwd2);
                 return false;
             },
             checkCode() {

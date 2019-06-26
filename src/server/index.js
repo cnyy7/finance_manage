@@ -10,7 +10,9 @@ import history from 'connect-history-api-fallback'
 import {Account, Member, Saving, Finance, Borrowing, Balance} from './data/model/Models'
 
 import {createConnection, getRepository} from 'typeorm'
+import sha256 from 'crypto-js/sha256';
 
+const SALT = 'c@QSK2*fpav939#F';
 // 正式环境时，下面两个模块不需要引入
 import webpackDevMiddleware from 'webpack-dev-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
@@ -109,12 +111,12 @@ app.get('/', function (req, res) {
 });
 
 app.post('/api/login', async function (req, res) {
-    let account = await AccountRepository.find({
+    let accounts = await AccountRepository.find({
         where: {name: req.body.name},
         relations: ["members"]
     });
-    if (account.pwd===req.body.pwd) {
-        res.json(account[0]);
+    if (accounts[0].pwd === sha256(req.body.pwd + SALT).toString()) {
+        res.json(accounts[0]);
     } else {
         res.status(203).end();
     }
@@ -122,13 +124,18 @@ app.post('/api/login', async function (req, res) {
 });
 
 app.post('/api/register', async function (req, res) {
-    let account=new Account(req.body.name,req.body.pwd,'normal');
-    AccountRepository.save(account).then(()=>{
-        res.status(200).end();
-    }).catch((err)=>{
-        console.log('error ==> '+err);
-        res.status(203).end();
-    });
+    let account = new Account(req.body.name, sha256(req.body.pwd + SALT)
+        .toString(), 'normal');
+    AccountRepository.save(account)
+                     .then(() => {
+                         res.status(200)
+                            .end();
+                     })
+                     .catch((err) => {
+                         console.log('error ==> ' + err);
+                         res.status(203)
+                            .end();
+                     });
     // res.json(toJSON(account, 'success'));
 });
 // catch 404 and forward to error handler
