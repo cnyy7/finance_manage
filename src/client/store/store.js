@@ -18,7 +18,7 @@ const store = new Vuex.Store({
     state: {
         isLogin: false,
         account: null,
-        member: null,
+        members: null,
         savings: null,
         balances: null,
         finances: null,
@@ -32,8 +32,8 @@ const store = new Vuex.Store({
         setAccount(state, account) {
             state.account = account;
         },
-        setMember(state, member) {
-            state.member = member;
+        setMembers(state, members) {
+            state.members = members;
         },
         setSavings(state, savings) {
             state.savings = savings;

@@ -113,7 +113,8 @@ app.post('/api/login', async function (req, res) {
         where: {name: req.body.name},
         relations: ["members"]
     });
-    if (accounts[0].pwd === sha256(req.body.pwd + SALT).toString()) {
+
+    if (accounts.length !== 0 && accounts[0].pwd === sha256(req.body.pwd + SALT).toString()) {
         res.json(accounts[0]);
     } else {
         res.status(203).end();
@@ -135,6 +136,15 @@ app.post('/api/register', async function (req, res) {
                             .end();
                      });
     // res.json(toJSON(account, 'success'));
+});
+
+app.post('/api/logout', function (req, res) {
+    res.status(200).end();
+});
+app.post('/api/getMembers', async function (req, res) {
+    let members = await MemberRepository.find({
+        where: {accountId: req.body.accountId},
+    });
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

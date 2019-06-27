@@ -71,7 +71,7 @@
             <el-input v-model="editForm.name"></el-input>
           </el-form-item>
           <el-form-item label="产品类型">
-            <el-select v-model="editForm.type" placeholder="请选择活动区域" style="width:100%;">
+            <el-select v-model="editForm.type" placeholder="请选择活动区域" style="width:100%;" >
               <el-option label="区域一" value="shanghai"></el-option>
               <el-option label="区域二" value="beijing"></el-option>
             </el-select>
@@ -106,8 +106,6 @@
   </el-container>
 </template>
 <script>
-  import Vue from 'vue'
-  import axios from 'axios'
 
   export default {
     data() {
@@ -144,10 +142,10 @@
     },
     created: function () {
       var data = [];
-      Vue.prototype.$http = axios;
+      // Vue.prototype.$http = axios;
       let _this = this;
       // 请求后台数据，渲染表格
-      this.$http.get('/static/table.json').then(function (res) {
+      this.$axios.get('/static/table.json').then(function (res) {
         console.log(res);
         console.log(res.data.chanpin.length);
         var datas = res.data.chanpin;
@@ -206,6 +204,9 @@
 
       },
       handleClose(done) {
+        this.$message({
+          message:JSON.stringify(this.editForm,null,2),
+        });
        this.$confirm('确认关闭？')
          .then(_ => {
            done();

@@ -5,12 +5,10 @@
                 <el-image class="el-logo" src="/static/logo.png" fit="scale-down"></el-image>
                 <h2 class="headlogo">{{project_name}}</h2>
                 <el-col :span="3" class="userinfo">
-                    <el-dropdown>
+                    <el-dropdown @command="handleCommand">
                         <i class="el-icon-setting" style="margin-right: 15px"></i>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item>查看</el-dropdown-item>
-                            <el-dropdown-item>新增</el-dropdown-item>
-                            <el-dropdown-item>删除</el-dropdown-item>
+                            <el-dropdown-item command="logout" style="color: red">注销</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                     <span>{{username}} + {{account.id}}</span>
@@ -54,12 +52,14 @@
 </template>
 
 <script>
+    import {mapState} from 'vuex';
+
     export default {
         data() {
             return {
                 searchCriteria: '',
-                project_name:'财务管理系统',
-                username:'鸭鸭',
+                project_name: '财务管理系统',
+                username: '鸭鸭',
             }
         },
         methods: {
@@ -77,22 +77,41 @@
                     case '2-1':
                         this.$router.push('/home/strategy');
                         break;
+                    case '2-2':
+                        this.$router.push('/home/members');
+                        break;
                 }
             },
-        },
-        computed:{
-            account(){
-                return this.$store.state.account;
+            handleCommand(command) {
+                if (command === 'logout') {
+                    this.$axios.post('/api/logout', {}).then((data) => {
+                        if (data.status === 200) {
+                            this.$store.commit('setLogin', false);
+                            this.$message({
+                                message: '注销成功',
+                                type: 'success'
+                            });
+                            this.$router.push('/login');
+                        }
+                    }).catch((err) => {
+                        console.log(err);
+                    })
+                }
             }
-        }
+        },
+        computed: mapState([
+            // 映射 this.account 为 store.state.account
+            'account'
+        ])
     }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    body{
+    body {
         background: white;
     }
+
     .con_section {
         position: absolute;
         top: 0px;
@@ -106,7 +125,7 @@
         line-height: 60px;
         background: #ECBB17;
         color: #000;
-        font-family: "Microsoft YaHei",serif;
+        font-family: "Microsoft YaHei", serif;
     }
 
     .el-menu-item.is-active {

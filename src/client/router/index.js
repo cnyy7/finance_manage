@@ -11,6 +11,7 @@ import strategy from "../components/strategy";
 import product from "../components/product";
 import forms from "../components/forms";
 import Home from "../components/Home";
+import members from "../components/members";
 import Register from "../components/Register";
 import App from "../App";
 
@@ -26,7 +27,7 @@ var router = new Router({
                 requireAuth: true,
             },
             component: Home
-        },{
+        }, {
             name: 'hello',
             path: '/hello',
             component: Hello
@@ -39,7 +40,7 @@ var router = new Router({
         {
             name: 'register',
             path: '/register',
-            component:Register
+            component: Register
         },
         {
             name: 'home',
@@ -53,6 +54,13 @@ var router = new Router({
                     path: 'product',
                     component: product,
                     name: '列表管理',
+                    meta: {
+                        requireAuth: true,
+                    },
+                },{
+                    path: 'members',
+                    component: members,
+                    name: '家庭成员管理',
                     meta: {
                         requireAuth: true,
                     },
@@ -91,8 +99,13 @@ router.beforeEach((to, from, next) => {
                 query: {redirect: to.fullPath}
             });
         }
-    } else {
+    } else if (to.path === '/login' && store.state.isLogin) {
+
         // 不需要登录的，可以继续访问
+        next({
+            path: '/home',
+        });
+    } else {
         next();
     }
 });

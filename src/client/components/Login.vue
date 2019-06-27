@@ -57,10 +57,9 @@
             inputSuccess(text) {
                 this.$refs.LoginFrom.validate((valid) => {
                     if (valid) {
-
                         this.logining = true;
-                        alert('1username: ' + this.account.username + '\npwd: ' + this.account.pwd);
-                        var pwd=sha256(this.account.pwd + '@Hi1Vssic7&kEIWb').toString();
+                        // alert('1username: ' + this.account.username + '\npwd: ' + this.account.pwd);
+                        var pwd = sha256(this.account.pwd + '@Hi1Vssic7&kEIWb').toString();
                         this.account.pwd = pwd.substring(0, 20);
                         var loginParams = {
                             name: this.account.username,
@@ -68,16 +67,26 @@
                         };
                         this.$axios.post('/api/login', loginParams)
                             .then((data) => {
-                                alert(JSON.stringify(data, null, 2));
+                                // alert(JSON.stringify(data, null, 2));
                                 console.log(JSON.stringify(data, null, 2));
                                 // this.$router.replace('/home');
                                 if (data.status === 200) {
                                     this.$store.commit('setLogin', true);
+                                    this.$message({
+                                        showClose: true,
+                                        message: '登陆成功',
+                                        type: 'success'
+                                    });
                                     this.$store.commit('setAccount', data.data);
                                     this.$router.push('/home');
                                     return true;
                                 } else {
-                                    alert("用户名或密码错误");
+                                    // alert("用户名或密码错误");
+                                    this.$message({
+                                        showClose: true,
+                                        message: '登陆失败:用户名或密码错误',
+                                        type: 'error'
+                                    });
                                     this.logining = false;
                                     this.$refs.LoginFrom.resetFields();
                                     this.$refs.Verify.refresh();
@@ -89,6 +98,7 @@
                         return false;
                     }
                 });
+
                 // alert('account.username: '+this.account.username+'\naccount.pwd: '+this.account.pwd);
                 console.log(text);
                 console.log('account.username: ' + this.account.username);
@@ -96,7 +106,12 @@
                 return false;
             },
             inputError(text) {
-                alert("验证码错误！请重新输入");
+                // alert("验证码错误！请重新输入");
+                this.$message({
+                    showClose: true,
+                    message: '验证码错误请重新输入',
+                    type: 'error'
+                });
                 console.log(text);
                 console.log('account.username: ' + this.account.username);
                 console.log('account.pwd: ' + this.account.pwd);
