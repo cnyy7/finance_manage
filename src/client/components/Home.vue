@@ -8,7 +8,7 @@
                     <el-dropdown @command="handleCommand">
                         <i class="el-icon-setting" style="margin-right: 15px"></i>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item command="changepwd" >修改密码</el-dropdown-item>
+                            <el-dropdown-item command="changepwd">修改密码</el-dropdown-item>
                             <el-dropdown-item command="logout" style="color: red">注销</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -18,18 +18,26 @@
             <el-container>
                 <el-aside style="flex: 0 0 230px;width: 230px;background:#eef1f6">
                     <el-menu default-active="1" class="el-menu-vertical-demo" @select="handleSelect">
-                        <el-submenu index="1">
-                            <template slot="title"><i class="el-icon-message"></i>管理系统</template>
-                            <el-menu-item index="1-1">列表管理</el-menu-item>
-                            <el-menu-item index="1-2">表单管理</el-menu-item>
-                        </el-submenu>
-                    </el-menu>
-                    <el-menu default-active="2" class="el-menu-vertical-demo" @select="handleSelect">
-                        <el-submenu index="2">
-                            <template slot="title"><i class="el-icon-message"></i>管理系统</template>
-                            <el-menu-item index="2-1">列表管理</el-menu-item>
-                            <el-menu-item index="2-2">表单管理</el-menu-item>
-                        </el-submenu>
+                        <el-menu-item index="1-1">
+                            <i class="el-icon-user"></i>
+                            <span slot="title">家庭成员管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="1-2">
+                            <i class="el-icon-bank-card"></i>
+                            <span slot="title">储蓄账户管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="1-3">
+                            <i class="el-icon-wallet"></i>
+                            <span slot="title">日常收支管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="1-4">
+                            <i class="el-icon-hot-water"></i>
+                            <span slot="title">借入借出管理</span>
+                        </el-menu-item>
+                        <el-menu-item index="1-5">
+                            <i class="el-icon-money"></i>
+                            <span slot="title">理财管理</span>
+                        </el-menu-item>
                     </el-menu>
                 </el-aside>
                 <el-main class="home_main">
@@ -70,15 +78,17 @@
             handleSelect(key, keyPath) {
                 switch (key) {
                     case '1-1':
-                        this.$router.push('/home/product');
+                        this.$router.push('/home/members');
                         break;
                     case '1-2':
-                        this.$router.push('/home/forms');
+                        this.$router.push('/home/members');
                         break;
-                    case '2-1':
-                        this.$router.push('/home/strategy');
+                    case '1-3':
+                        this.$router.push('/home/members');
                         break;
-                    case '2-2':
+                    case '1-4':
+                        this.$router.push('/home/members');
+                        break;case '1-5':
                         this.$router.push('/home/members');
                         break;
                 }
@@ -97,8 +107,7 @@
                     }).catch((err) => {
                         console.log(err);
                     })
-                }else if(command==='changepwd')
-                {
+                } else if (command === 'changepwd') {
                     this.$router.push('/home/changepwd');
                 }
             }

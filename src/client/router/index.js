@@ -7,9 +7,6 @@ import store from './../store/store'
 // 导入相应的子组件
 import Hello from './../components/Hello'
 import Login from "../components/Login";
-import strategy from "../components/strategy";
-import product from "../components/product";
-import forms from "../components/forms";
 import Home from "../components/Home";
 import members from "../components/members";
 import Register from "../components/Register";
@@ -51,33 +48,10 @@ var router = new Router({
                 requireAuth: true,
             },
             children: [
-                {
-                    path: 'product',
-                    component: product,
-                    name: '列表管理',
-                    meta: {
-                        requireAuth: true,
-                    },
-                },{
+               {
                     path: 'members',
                     component: members,
                     name: '家庭成员管理',
-                    meta: {
-                        requireAuth: true,
-                    },
-                },
-                {
-                    path: 'strategy',
-                    component: strategy,
-                    name: '瞎画的',
-                    meta: {
-                        requireAuth: true,
-                    },
-                },
-                {
-                    path: 'forms',
-                    component: forms,
-                    name: '表单管理',
                     meta: {
                         requireAuth: true,
                     },

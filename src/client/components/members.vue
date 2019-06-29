@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-button @click="insertRowEvent" type="primary">插入新成员</el-button>
+        <el-button @click="insertRowEvent" type="primary" style="margin-bottom: 5px">插入新成员</el-button>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -8,18 +8,21 @@
                 resizable
                 show-overflow
                 height="540"
+                :loading="loading"
                 :data.sync="members"
                 :edit-config="{key: 'id', trigger: 'manual', mode: 'row',activeMethod: activeCellMethod}"
                 @edit-disabled="editDisabledEvent">
             <vxe-table-column type="index" width="60"></vxe-table-column>
             <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'input'}" :disabled="false"></vxe-table-column>-->
-            <vxe-table-column prop="name" label="姓名" :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column prop="control" label="控制" :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column prop="phone" label="电话" :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column prop="age" label="年龄"
+            <vxe-table-column field="name" title="姓名" sortable :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]" :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
+            <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'input'}"></vxe-table-column>-->
+            <vxe-table-column field="sex" title="性别" sortable
+                              :edit-render="{name: 'ElSelect', options: sexList}"></vxe-table-column>
+            <vxe-table-column field="control" title="控制" sortable :edit-render="{name: 'input'}"></vxe-table-column>
+            <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'input'}"></vxe-table-column>
+            <vxe-table-column field="age" title="年龄" sortable :filters="[{data: 0}]" :filter-render="{name: 'ElInputNumber', props: {min: 0, max: 150}}"
                               :edit-render="{name: 'ElInputNumber', props: {max: 150, min: 0,size:'small'}}"></vxe-table-column>
-            <vxe-table-column label="操作">
+            <vxe-table-column title="操作">
                 <template v-slot="{ row }">
                     <template v-if="$refs.xTable.hasActiveRow(row)">
                         <el-button @click="saveRowEvent(row)" type="warning" size="small">保存</el-button>
@@ -41,10 +44,23 @@
         data() {
             return {
                 tableData: this.$store.state.members,
+                sexList: [
+                    {
+                        'label': '男',
+                        'value': '男'
+                    },
+                    {
+                        'label': '女',
+                        'value': '女'
+                    }
+                ],
+                loading: true,
             }
         },
         created() {
+            this.loading = true;
             this.loadData();
+            this.loading = false;
         },
         methods: {
             activeCellMethod({column, columnIndex}) {
@@ -63,6 +79,7 @@
                 this.$refs.xTable.setActiveRow(row)
             },
             removeRowEvent(row) {
+                this.loading = true;
                 this.$axios.post('/api/removeMember', {
                     member: row,
                 }).then((data) => {
@@ -73,9 +90,10 @@
                         this.errorMessage("删除失败");
                     }
                 });
-
+                this.loading = false;
             },
             saveRowEvent(row) {
+                this.loading = true;
                 row.account = this.$store.state.account;
                 // alert(JSON.stringify(row, null, 2));
                 var isInsert = false;
@@ -104,15 +122,8 @@
                         }
                     }
                 });
-                // if (isInsert) {
-                //     this.loadData();
-                // }
-                // this.$axios.post('/api/getMembers', {
-                //     accountId: this.$store.state.account.id
-                // }).then((data) => {
-                //     this.$store.commit('setMembers',data.data);
-                // });
                 this.$refs.xTable.clearActived();
+                this.loading = false;
             },
             cancelRowEvent(row) {
                 this.$refs.xTable.revert(row);
