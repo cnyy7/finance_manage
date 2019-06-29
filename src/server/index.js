@@ -53,24 +53,24 @@ createConnection({
     BalanceRepository = getRepository(Balance);
     BorrowingRepository = getRepository(Borrowing);
     FinanceRepository = getRepository(Finance);
-    // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
-    let account = await AccountRepository.find({
-        where: {name: "fafsddsdsssdfas"},
-        relations: ["members"]
-    });
-    console.log('account:' + JSON.stringify(account, null, 2));
-    let member = await MemberRepository.find({
-        where: {name: 'fasaffdssdad1'},
-        relations: ["account", "savings"]
-    });
-    console.log('member:' + JSON.stringify(member, null, 2));
-    let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
-    // let newsaving = await SavingRepository.save(saving);
-    let newsaving = await SavingRepository.find({
-        where: {bankName: 'fads'},
-        relations: ["member"]
-    });
-    console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
+    // // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
+    // let account = await AccountRepository.find({
+    //     where: {name: "fafsddsdsssdfas"},
+    //     relations: ["members"]
+    // });
+    // console.log('account:' + JSON.stringify(account, null, 2));
+    // let member = await MemberRepository.find({
+    //     where: {name: 'fasaffdssdad1'},
+    //     relations: ["account", "savings"]
+    // });
+    // console.log('member:' + JSON.stringify(member, null, 2));
+    // let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
+    // // let newsaving = await SavingRepository.save(saving);
+    // let newsaving = await SavingRepository.find({
+    //     where: {bankName: 'fads'},
+    //     relations: ["member"]
+    // });
+    // console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
     console.log('数据库连接成功');
     return true
 })
@@ -111,10 +111,11 @@ app.get('/', function (req, res) {
 app.post('/api/login', async function (req, res) {
     let accounts = await AccountRepository.find({
         where: {name: req.body.name},
-        relations: ["members"]
+        // relations: ["members"]
     });
 
     if (accounts.length !== 0 && accounts[0].pwd === sha256(req.body.pwd + SALT).toString()) {
+        accounts[0].pwd = accounts[0].pwd.substring(0, 1);
         res.json(accounts[0]);
     } else {
         res.status(203).end();
@@ -138,12 +139,49 @@ app.post('/api/register', async function (req, res) {
     // res.json(toJSON(account, 'success'));
 });
 
+app.post('/api/changepwd', async function (req, res) {
+    // console.log(JSON.stringify(req.body,null,2));
+    let account = new Account(undefined, sha256(req.body.pwd + SALT)
+        .toString(), undefined, undefined, undefined, req.body.id);
+    AccountRepository.save(account)
+                     .then(() => {
+                         res.status(200)
+                            .end();
+                     })
+                     .catch((err) => {
+                         console.log('error ==> ' + err);
+                         res.status(203)
+                            .end();
+                     });
+    // res.json(toJSON(account, 'success'));
+});
+
 app.post('/api/logout', function (req, res) {
     res.status(200).end();
 });
 app.post('/api/getMembers', async function (req, res) {
+    console.log("req.body.accountId:" + req.body.accountId);
     let members = await MemberRepository.find({
-        where: {accountId: req.body.accountId},
+        account: {id: req.body.accountId}
+    });
+    // console.log(JSON.stringify(members, null, 2));
+    res.json(members);
+});
+app.post('/api/saveMember', async function (req, res) {
+    // console.log(JSON.stringify(req.body.member, null, 2));
+    MemberRepository.save(req.body.member).then((data) => {
+        res.json(data);
+    }).catch((err) => {
+        console.log('error ==> ' + err);
+        res.status(203).end();
+    });
+});
+app.post('/api/removeMember', async function (req, res) {
+    MemberRepository.remove(req.body.member).then(() => {
+        res.status(200).end();
+    }).catch((err) => {
+        console.log('error ==> ' + err);
+        res.status(203).end();
     });
 });
 // catch 404 and forward to error handler

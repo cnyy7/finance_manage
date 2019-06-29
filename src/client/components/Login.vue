@@ -113,8 +113,8 @@
                     type: 'error'
                 });
                 console.log(text);
-                console.log('account.username: ' + this.account.username);
-                console.log('account.pwd: ' + this.account.pwd);
+                // console.log('account.username: ' + this.account.username);
+                // console.log('account.pwd: ' + this.account.pwd);
                 return false;
             },
             checkCode() {

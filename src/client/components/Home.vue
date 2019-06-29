@@ -4,14 +4,15 @@
             <el-header class="yellowheader">
                 <el-image class="el-logo" src="/static/logo.png" fit="scale-down"></el-image>
                 <h2 class="headlogo">{{project_name}}</h2>
-                <el-col :span="3" class="userinfo">
+                <el-col :span="2" class="userinfo">
                     <el-dropdown @command="handleCommand">
                         <i class="el-icon-setting" style="margin-right: 15px"></i>
                         <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="changepwd" >修改密码</el-dropdown-item>
                             <el-dropdown-item command="logout" style="color: red">注销</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
-                    <span>{{username}} + {{account.id}}</span>
+                    <span>{{account.name}}</span>
                 </el-col>
             </el-header>
             <el-container>
@@ -96,6 +97,9 @@
                     }).catch((err) => {
                         console.log(err);
                     })
+                }else if(command==='changepwd')
+                {
+                    this.$router.push('/home/changepwd');
                 }
             }
         },

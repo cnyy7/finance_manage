@@ -13,6 +13,7 @@ import forms from "../components/forms";
 import Home from "../components/Home";
 import members from "../components/members";
 import Register from "../components/Register";
+import changepwd from "../components/changepwd";
 import App from "../App";
 
 Vue.use(Router);
@@ -77,6 +78,14 @@ var router = new Router({
                     path: 'forms',
                     component: forms,
                     name: '表单管理',
+                    meta: {
+                        requireAuth: true,
+                    },
+                },
+                {
+                    path: 'changepwd',
+                    component: changepwd,
+                    name: '修改密码',
                     meta: {
                         requireAuth: true,
                     },
