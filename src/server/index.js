@@ -9,7 +9,7 @@ import "reflect-metadata";
 import history from 'connect-history-api-fallback'
 import {Account, Member, Saving, Finance, Borrowing, Balance} from './data/model/Models'
 
-import {createConnection, getRepository} from 'typeorm'
+import {createConnection, getRepository, In} from 'typeorm'
 import sha256 from 'crypto-js/sha256';
 
 const SALT = 'c@QSK2*fpav939#F';
@@ -19,16 +19,16 @@ import webpackHotMiddleware from 'webpack-hot-middleware'
 
 import config from '../../build/webpack.dev.conf'
 
-function toJSON(data = {}, message = '', status = '', code = '') {
-    return Object(JSON.stringify({
-        data,
-        message,
-        status,
-        code
-    }))
-}
 
-var AccountRepository, MemberRepository, SavingRepository, BalanceRepository, BorrowingRepository, FinanceRepository;
+let Repositories = {
+    accountRepository: null,
+    memberRepository: null,
+    savingRepository: null,
+    balanceRepository: null,
+    borrowingRepository: null,
+    financeRepository: null,
+};
+const RepositoryString = 'Repository';
 createConnection({
     type: 'mysql', // 数据库类型
     host: '127.0.0.1', // 数据库地址
@@ -47,38 +47,19 @@ createConnection({
     synchronize: true,
 }).then(async (connection) => {
     // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
-    AccountRepository = getRepository(Account);
-    MemberRepository = getRepository(Member);
-    SavingRepository = getRepository(Saving);
-    BalanceRepository = getRepository(Balance);
-    BorrowingRepository = getRepository(Borrowing);
-    FinanceRepository = getRepository(Finance);
-    // // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
-    // let account = await AccountRepository.find({
-    //     where: {name: "fafsddsdsssdfas"},
-    //     relations: ["members"]
-    // });
-    // console.log('account:' + JSON.stringify(account, null, 2));
-    // let member = await MemberRepository.find({
-    //     where: {name: 'fasaffdssdad1'},
-    //     relations: ["account", "savings"]
-    // });
-    // console.log('member:' + JSON.stringify(member, null, 2));
-    // let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
-    // // let newsaving = await SavingRepository.save(saving);
-    // let newsaving = await SavingRepository.find({
-    //     where: {bankName: 'fads'},
-    //     relations: ["member"]
-    // });
-    // console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
+    Repositories.accountRepository = getRepository(Account);
+    Repositories.memberRepository = getRepository(Member);
+    Repositories.savingRepository = getRepository(Saving);
+    Repositories.balanceRepository = getRepository(Balance);
+    Repositories.borrowingRepository = getRepository(Borrowing);
+    Repositories.financeRepository = getRepository(Finance);
     console.log('数据库连接成功');
     return true
-})
-  .catch((error) => {
-      console.log('应用启动失败');
-      console.log(error);
-      return false
-  });
+}).catch((error) => {
+    console.log('应用启动失败');
+    console.log(error);
+    return false
+});
 
 const app = express();
 
@@ -100,7 +81,6 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 
 app.use(webpackHotMiddleware(compiler));
-
 app.use(express.static(path.join(__dirname, 'views')));
 app.use('/static', express.static('src/client/static'));
 app.use('/static', express.static('src/server/static'));
@@ -109,103 +89,130 @@ app.get('/', function (req, res) {
 });
 
 app.post('/api/login', async function (req, res) {
-    let accounts = await AccountRepository.find({
-        where: {name: req.body.name},
-        // relations: ["members"]
-    });
 
-    if (accounts.length !== 0 && accounts[0].pwd === sha256(req.body.pwd + SALT).toString()) {
-        var cookieString = accounts[0].id + '.' + sha256(accounts[0].name + SALT)
-            .toString();
-        accounts[0].pwd = accounts[0].pwd.substring(0, 1);
-        res.cookie('account', cookieString, {expires: new Date(Date.now() + 1000 * 60 * 10)});
-        res.json(accounts[0]);
-    } else {
-        res.status(203).end();
-    }
-    // res.json(toJSON(account, 'success'));
+    let account = await Repositories.accountRepository.findOne(
+        {name: req.body.name}
+    );
+    account ? res.json(account) : res.status(404).end();
 });
-app.post('/api/getAccount', function (req, res) {
-    AccountRepository.findOne(req.body.id).then((data) => {
-        // console.log(JSON.stringify(data,null,2));
-        data.pwd = data.pwd.substring(0, 1);
-        res.json(data);
-    }).catch((err) => {
-        console.log('err ==>  :' + err);
-        res.status(203).end();
-    })
-    // console.log(JSON.stringify(members, null, 2));
-});
+
 app.post('/api/register', async function (req, res) {
-    let account = new Account(req.body.name, sha256(req.body.pwd + SALT)
+    const account = new Account(req.body.name, sha256(req.body.pwd + SALT)
         .toString(), 'normal');
-    AccountRepository.save(account)
-                     .then(() => {
-                         res.status(200)
-                            .end();
-                     })
-                     .catch((err) => {
-                         console.log('error ==> ' + err);
-                         res.status(203)
-                            .end();
-                     });
+    try {
+        const newAccount = await Repositories.accountRepository.save(account);
+        res.status(200).end();
+    } catch (e) {
+        console.log('error ==> ' + e);
+        res.status(404).end();
+    }
     // res.json(toJSON(account, 'success'));
 });
 
 app.post('/api/changepwd', async function (req, res) {
     // console.log(JSON.stringify(req.body,null,2));
-    let account = new Account(undefined, sha256(req.body.pwd + SALT)
+    const account = new Account(undefined, sha256(req.body.pwd + SALT)
         .toString(), undefined, undefined, undefined, req.body.id);
-    AccountRepository.save(account)
-                     .then(() => {
-                         res.status(200)
-                            .end();
-                     })
-                     .catch((err) => {
-                         console.log('error ==> ' + err);
-                         res.status(203)
-                            .end();
-                     });
-    // res.json(toJSON(account, 'success'));
+    try {
+        const newAccount = await Repositories.accountRepository.save(account);
+        res.status(200).end();
+    } catch (e) {
+        console.log('error ==> ' + e);
+        res.status(404).end();
+    }
 });
 
 app.post('/api/logout', function (req, res) {
     res.clearCookie('account');
     res.status(200).end();
 });
-app.post('/api/getMembers', async function (req, res) {
-    console.log("req.body.accountId:" + req.body.accountId);
-    let members = await MemberRepository.find({
-        account: {id: req.body.accountId}
-    });
-    // console.log(JSON.stringify(members, null, 2));
-    res.json(members);
-});
-app.post('/api/saveMember', async function (req, res) {
-    // console.log(JSON.stringify(req.body.member, null, 2));
-    MemberRepository.save(req.body.member).then((data) => {
+
+app.post('/api/getOne/:type', async function (req, res) {
+    try {
+        const data = await Repositories[req.params.type.toLowerCase() + RepositoryString].findOne(req.body.id);
+        if (req.params.type.toLowerCase() === 'account') {
+            data.pwd = data.pwd.substring(0, 1);
+        }
         res.json(data);
-    }).catch((err) => {
-        console.log('error ==> ' + err);
-        res.status(203).end();
-    });
+    } catch (e) {
+        console.log('RepositoryType : ' + req.params.type.toLowerCase());
+        console.log('Repository : ' + JSON.stringify(req.body.id, null, 2));
+        console.log('error ==> ' + e);
+        res.status(404).end();
+    }
 });
-app.post('/api/removeMember', async function (req, res) {
-    if (req.body.member.id === undefined) {
-        res.status(200).end();
-    } else {
-        MemberRepository.remove(req.body.member).then(() => {
+
+app.post('/api/getAll/:type', async function (req, res) {
+    try {
+        if (req.params.type.toLowerCase() === 'account') {
+            const account = await Repositories.accountRepository.findOne(req.body.id);
+            if (account.type === 'administrator') {
+                const accountList = await Repositories.accountRepository.find();
+                res.json(accountList);
+            } else {
+                res.status(404).end();
+            }
+        } else {
+            let members = await Repositories.memberRepository.find({
+                account: {id: req.body.id}
+            });
+            if (req.params.type.toLowerCase() === 'member') {
+                res.json(members);
+            } else {
+                let memberIds = members.map((a) => a.id);
+                // console.log('memberIds: ' + memberIds);
+                let tempDataList = await Repositories[req.params.type.toLowerCase() + RepositoryString].find({
+                    member: {id: In(memberIds)},
+                });
+                let tempDataIds = tempDataList.map((a) => a.id);
+                let realDataList = await Repositories[req.params.type.toLowerCase() + RepositoryString].findByIds(tempDataIds, {
+                    relations: ['member']
+                });
+                // console.log('realDataList: ' + JSON.stringify(realDataList, null, 2));
+                res.json(realDataList);
+            }
+        }
+    } catch (e) {
+        console.log('RepositoryType : ' + req.params.type.toLowerCase());
+        console.log('Repository : ' + JSON.stringify(req.body.id, null, 2));
+        console.log('error ==> ' + e);
+        res.status(404).end();
+    }
+});
+
+app.post('/api/save/:type', async function (req, res) {
+    // console.log(JSON.stringify(req.body.member, null, 2));
+    try {
+        const data = await Repositories[req.params.type.toLowerCase() + RepositoryString].save(req.body.data);
+        res.json(data);
+    } catch (e) {
+        console.log('RepositoryType : ' + req.params.type.toLowerCase());
+        console.log('Repository : ' + JSON.stringify(req.body.data, null, 2));
+        console.log('error ==> ' + e);
+        res.status(404).end();
+    }
+});
+
+app.post('/api/remove/:type', async function (req, res) {
+    try {
+        if (req.body.data.id === undefined) {
             res.status(200).end();
-        }).catch((err) => {
-            console.log('error ==> ' + err);
-            res.status(203).end();
-        });
+        } else {
+            const data = await Repositories[req.params.type.toLowerCase() + RepositoryString].remove(req.body.data);
+            res.status(200).end();
+        }
+    } catch (e) {
+        console.log('RepositoryType : ' + req.params.type.toLowerCase());
+        console.log('Repository : ' + JSON.stringify(req.body.data, null, 2));
+        console.log('error ==> ' + e);
+        res.status(404).end();
     }
 
 });
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    var err = new Error(req.full + ': Not Found');
+    var err = new Error(req.url + ': Not Found');
     err.status = 404;
     next(err);
 });

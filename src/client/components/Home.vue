@@ -81,10 +81,10 @@
                         this.$router.push('/home/members');
                         break;
                     case '1-2':
-                        this.$router.push('/home/members');
+                        this.$router.push('/home/savings');
                         break;
                     case '1-3':
-                        this.$router.push('/home/members');
+                        this.$router.push('/home/balances');
                         break;
                     case '1-4':
                         this.$router.push('/home/members');

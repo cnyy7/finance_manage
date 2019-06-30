@@ -27,7 +27,7 @@ const store = new Vuex.Store({
     mutations: {
         setLogin(state, new_login_state) {
             state.isLogin = new_login_state;
-            console.log('setLogin to ' + new_login_state);
+            // console.log('setLogin to ' + new_login_state);
         },
         setAccount(state, account) {
             state.account = account;
@@ -37,6 +37,9 @@ const store = new Vuex.Store({
         },
         setSavings(state, savings) {
             state.savings = savings;
+        },
+        setBalances(state, balances) {
+            state.balances = balances;
         },
         setFinances(state, finances) {
             state.finances = finances;

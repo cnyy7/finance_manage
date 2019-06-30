@@ -7,7 +7,14 @@ const Balance = require("../model/Models").Balance;
 const Borrowing = require("../model/Models").Borrowing;
 const Finance = require("../model/Models").Finance;
 const sha256 = require('crypto-js/sha256');
-
+let Repositories = {
+    accountRepository: null,
+    memberRepository: null,
+    savingRepository: null,
+    balanceRepository: null,
+    borrowingRepository: null,
+    financeRepository: null,
+};
 createConnection({
     type: 'mysql', // 数据库类型
     host: '127.0.0.1', // 数据库地址
@@ -26,50 +33,33 @@ createConnection({
     synchronize: true,
 })
     .then(async (connection) => {
+        Repositories.accountRepository = getRepository(Account);
+        Repositories.memberRepository = getRepository(Member);
+        Repositories.savingRepository = getRepository(Saving);
+        Repositories.balanceRepository = getRepository(Balance);
+        Repositories.borrowingRepository = getRepository(Borrowing);
+        Repositories.financeRepository = getRepository(Finance);
+        // let accounts = await Repositories.accountRepository.find({
+        //     relations: ['members']
+        // });
+        // console.log('accounts.length: ' + accounts.length);
+        // console.log('accounts: ' + JSON.stringify(accounts, null, 2));
+        let Ids=[2,3,4,4534];
 
-        // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
-        const AccountRepository = getRepository(Account);
-        const MemberRepository = getRepository(Member);
-        const SavingRepository = getRepository(Saving);
-        const BalanceRepository = getRepository(Balance);
-        const BorrowingRepository = getRepository(Borrowing);
-        const FinanceRepository = getRepository(Finance);
-        // let account1 = await accountRepository.find({ select: ["id"],where:{name:"fafsdssdfas"}});
-        let accounts = await AccountRepository.find({
-            where: {name: "da"},
-            relations: ["members"]
+        let members = await Repositories.memberRepository.findByIds(Ids,{relations: ['account']});
+        // let members = await Repositories.memberRepository.find({
+        //     account: {id: 2},
+        //     // relations: ['account']
+        // });
+        console.log('members.length: ' + members.length);
+        console.log('members: ' + JSON.stringify(members, null, 2));
+
+        let dataList = await Repositories.savingRepository.find({
+            member: {id: 7},
+            // relations: ['member']
         });
-        AccountRepository.delete(accounts[0]);
-        // console.log('account:' + JSON.stringify(accounts, null, 2));
-        // let member = await MemberRepository.find({
-        //     where: {name: 'fasaffdssdad1'},
-        //     relations: ["account", "savings", 'borrowings', 'balances','finances']
-        // });
-        // console.log('member:' + JSON.stringify(member, null, 2));
-        // let borrowing = new Borrowing('dsa', 32.2, new Date(), new Date(), 'fas', 'fsad', 'fasd', member[0]);
-        // // let newborrowing=await BorrowingRepository.save(borrowing);
-        // let newborrowing = await BorrowingRepository.find({
-        //     where: {type: 'dsa'},
-        //     relations: ["member"]
-        // });
-        // console.log("newborrowing: " + JSON.stringify(newborrowing, null, 2));
-        // let finance = new Finance('dsa', 'fads',32.2,new Date(),new Date(),undefined,member[0]);
-        // // let newfinance=await FinanceRepository.save(finance);
-        // let newfinance = await FinanceRepository.find({
-        //     where: {money: 32.2},
-        //     relations: ["member"]
-        // });
-        // console.log("newfinance: " + JSON.stringify(newfinance, null, 2));
-        // // let saving = new Saving("fads", "fasdd", "adsdf", new Date(), new Date(), member[0], account[0]);
-        // // // let newsaving = await SavingRepository.save(saving);
-        // // let newsaving = await SavingRepository.find({
-        // //     where: {bankName: 'fads'},
-        // //     relations: ["member"]
-        // // });
-        // // console.log("newsaving: " + JSON.stringify(newsaving, null, 2));
-        // // let balance = new Balance('afs', new Date(), 2.3, 'fsa', 'fasdf', member[0]);
-        // // let newbalance = await BalanceRepository.save(balance);
-        // // console.log("newbalance: " + JSON.stringify(newbalance, null, 2));
+        console.log('dataList.length: ' + dataList.length);
+        console.log('dataList: ' + JSON.stringify(dataList, null, 2));
         return true
     })
     .catch((error) => {

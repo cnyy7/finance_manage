@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-button @click="insertRowEvent" type="primary" style="margin-bottom: 5px">添加新成员</el-button>
+        <el-button @click="insertRowEvent" type="primary" style="margin-bottom: 5px">添加新储蓄账户</el-button>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -9,21 +9,22 @@
                 show-overflow
                 height="540"
                 :loading="loading"
-                :data.sync="members"
+                :data.sync="savings"
                 :edit-config="{key: 'id', trigger: 'manual', mode: 'row',activeMethod: activeCellMethod}"
                 @edit-disabled="editDisabledEvent">
             <vxe-table-column type="index" width="60"></vxe-table-column>
             <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'input'}" :disabled="false"></vxe-table-column>-->
-            <vxe-table-column field="name" title="姓名" sortable :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+            <vxe-table-column field="bankName" title="银行名" sortable :edit-render="{name: 'ElInput'}"
+                              :filters="[{data: ''}]"
                               :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
             <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'input'}"></vxe-table-column>-->
-            <vxe-table-column field="sex" title="性别" sortable
-                              :edit-render="{name: 'ElSelect', options: sexList}"></vxe-table-column>
-            <vxe-table-column field="control" title="控制" sortable :edit-render="{name: 'input'}"></vxe-table-column>
+            <vxe-table-column field="member.id" title="持卡人" sortable
+                              :edit-render="{name: 'ElSelect', options: membersList}"></vxe-table-column>
+            <vxe-table-column field="cardNumber" title="银行卡号" sortable
+                              :edit-render="{name: 'input'}"></vxe-table-column>
             <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column field="age" title="年龄" sortable :filters="[{data: 0}]"
-                              :filter-render="{name: 'ElInputNumber', props: {min: 0, max: 150}}"
-                              :edit-render="{name: 'ElInputNumber', props: {max: 150, min: 0,size:'small'}}"></vxe-table-column>
+            <vxe-table-column field="beginTime" title="办卡时间" sortable :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+            <vxe-table-column field="updateTime" title="更新时间" sortable :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
             <vxe-table-column title="操作">
                 <template v-slot="{ row }">
                     <template v-if="$refs.xTable.hasActiveRow(row)">
@@ -45,17 +46,8 @@
     export default {
         data() {
             return {
-                tableData: this.$store.state.members,
-                sexList: [
-                    {
-                        'label': '男',
-                        'value': '男'
-                    },
-                    {
-                        'label': '女',
-                        'value': '女'
-                    }
-                ],
+                tableData: this.$store.state.savings,
+                membersList: [],
                 loading: true,
             }
         },
@@ -87,14 +79,14 @@
                     type: 'warning'
                 }).then(() => {
                     this.loading = true;
-                    this.$axios.post('/api/remove/Member', {
+                    this.$axios.post('/api/remove/Saving', {
                         member: row,
                     }).then((data) => {
                         if (data.status === 200) {
                             this.$refs.xTable.remove(row);
                             this.successMessage("删除成功");
                         } else {
-                            this.errorMessage("删除失败，可能有与该成员对应的其他项目，请先删除其他项目。");
+                            this.errorMessage("删除失败");
                         }
                     });
                     this.loading = false;
@@ -110,7 +102,7 @@
                 this.loading = true;
                 row.account = this.$store.state.account;
                 // alert(JSON.stringify(row, null, 2));
-                this.$axios.post('/api/save/Member', {
+                this.$axios.post('/api/save/Saving', {
                     data: row,
                 }).then((data) => {
                     if (data.status === 200) {
@@ -161,17 +153,23 @@
                 });
             },
             loadData() {
-                this.$axios.post('/api/getAll/Member', {
+                this.$axios.post('/api/getAll/Saving', {
                     id: this.$store.state.account.id
                 }).then((data) => {
-                    this.$store.commit('setMembers', data.data);
+                    this.$store.commit('setSavings', data.data);
+                    this.membersList = this.savings.map((e) => {
+                        return {
+                            label: e.member.name,
+                            value: e.member.id
+                        }
+                    });
                 });
             }
         },
         computed: mapState([
             // 映射 this.account 为 store.state.account
             'account',
-            'members',
+            'savings',
         ])
     }
 </script>

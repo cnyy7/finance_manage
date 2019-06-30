@@ -10,6 +10,8 @@ import Login from "../components/Login";
 import Home from "../components/Home";
 import members from "../components/members";
 import Register from "../components/Register";
+import savings from "../components/savings";
+import balances from "../components/balances";
 import changepwd from "../components/changepwd";
 import axios from 'axios'
 import sha256 from 'crypto-js/sha256';
@@ -57,6 +59,20 @@ var router = new Router({
                     meta: {
                         requireAuth: true,
                     },
+                },{
+                    path: 'savings',
+                    component: savings,
+                    name: '储蓄账户管理',
+                    meta: {
+                        requireAuth: true,
+                    },
+                },{
+                    path: 'balances',
+                    component: balances,
+                    name: '日常收支管理',
+                    meta: {
+                        requireAuth: true,
+                    },
                 },
                 {
                     path: 'changepwd',
@@ -83,7 +99,7 @@ router.beforeEach((to, from, next) => {
             if (accountString != null) {
                 console.log('has cookie account verifying...');
                 var accountStrings = accountString.split('.');
-                axios.post('/api/getAccount', {
+                axios.post('/api/getOne/Account', {
                     id: parseInt(accountStrings[0]),
                 }).then((data) => {
                     var account = data.data;
