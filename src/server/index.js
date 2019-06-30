@@ -115,14 +115,27 @@ app.post('/api/login', async function (req, res) {
     });
 
     if (accounts.length !== 0 && accounts[0].pwd === sha256(req.body.pwd + SALT).toString()) {
+        var cookieString = accounts[0].id + '.' + sha256(accounts[0].name + SALT)
+            .toString();
         accounts[0].pwd = accounts[0].pwd.substring(0, 1);
+        res.cookie('account', cookieString, {expires: new Date(Date.now() + 1000 * 60 * 10)});
         res.json(accounts[0]);
     } else {
         res.status(203).end();
     }
     // res.json(toJSON(account, 'success'));
 });
-
+app.post('/api/getAccount', function (req, res) {
+    AccountRepository.findOne(req.body.id).then((data) => {
+        // console.log(JSON.stringify(data,null,2));
+        data.pwd = data.pwd.substring(0, 1);
+        res.json(data);
+    }).catch((err) => {
+        console.log('err ==>  :' + err);
+        res.status(203).end();
+    })
+    // console.log(JSON.stringify(members, null, 2));
+});
 app.post('/api/register', async function (req, res) {
     let account = new Account(req.body.name, sha256(req.body.pwd + SALT)
         .toString(), 'normal');
@@ -157,6 +170,7 @@ app.post('/api/changepwd', async function (req, res) {
 });
 
 app.post('/api/logout', function (req, res) {
+    res.clearCookie('account');
     res.status(200).end();
 });
 app.post('/api/getMembers', async function (req, res) {
@@ -177,12 +191,17 @@ app.post('/api/saveMember', async function (req, res) {
     });
 });
 app.post('/api/removeMember', async function (req, res) {
-    MemberRepository.remove(req.body.member).then(() => {
+    if (req.body.member.id === undefined) {
         res.status(200).end();
-    }).catch((err) => {
-        console.log('error ==> ' + err);
-        res.status(203).end();
-    });
+    } else {
+        MemberRepository.remove(req.body.member).then(() => {
+            res.status(200).end();
+        }).catch((err) => {
+            console.log('error ==> ' + err);
+            res.status(203).end();
+        });
+    }
+
 });
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

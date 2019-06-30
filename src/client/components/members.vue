@@ -14,13 +14,15 @@
                 @edit-disabled="editDisabledEvent">
             <vxe-table-column type="index" width="60"></vxe-table-column>
             <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'input'}" :disabled="false"></vxe-table-column>-->
-            <vxe-table-column field="name" title="姓名" sortable :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]" :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
+            <vxe-table-column field="name" title="姓名" sortable :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
             <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'input'}"></vxe-table-column>-->
             <vxe-table-column field="sex" title="性别" sortable
                               :edit-render="{name: 'ElSelect', options: sexList}"></vxe-table-column>
             <vxe-table-column field="control" title="控制" sortable :edit-render="{name: 'input'}"></vxe-table-column>
             <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column field="age" title="年龄" sortable :filters="[{data: 0}]" :filter-render="{name: 'ElInputNumber', props: {min: 0, max: 150}}"
+            <vxe-table-column field="age" title="年龄" sortable :filters="[{data: 0}]"
+                              :filter-render="{name: 'ElInputNumber', props: {min: 0, max: 150}}"
                               :edit-render="{name: 'ElInputNumber', props: {max: 150, min: 0,size:'small'}}"></vxe-table-column>
             <vxe-table-column title="操作">
                 <template v-slot="{ row }">
@@ -79,27 +81,35 @@
                 this.$refs.xTable.setActiveRow(row)
             },
             removeRowEvent(row) {
-                this.loading = true;
-                this.$axios.post('/api/removeMember', {
-                    member: row,
-                }).then((data) => {
-                    if (data.status === 200) {
-                        this.$refs.xTable.remove(row);
-                        this.successMessage("删除成功");
-                    } else {
-                        this.errorMessage("删除失败");
-                    }
-                });
-                this.loading = false;
+                this.$confirm('此操作将永久删除该成员, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.loading = true;
+                    this.$axios.post('/api/removeMember', {
+                        member: row,
+                    }).then((data) => {
+                        if (data.status === 200) {
+                            this.$refs.xTable.remove(row);
+                            this.successMessage("删除成功");
+                        } else {
+                            this.errorMessage("删除失败");
+                        }
+                    });
+                    this.loading = false;
+                }).catch(() => {
+                    this.successMessage("已取消删除");
+                })
             },
             saveRowEvent(row) {
-                this.loading = true;
-                row.account = this.$store.state.account;
-                // alert(JSON.stringify(row, null, 2));
                 var isInsert = false;
                 if (row.id === undefined) {
                     isInsert = true;
                 }
+                this.loading = true;
+                row.account = this.$store.state.account;
+                // alert(JSON.stringify(row, null, 2));
                 this.$axios.post('/api/saveMember', {
                     member: row,
                 }).then((data) => {

@@ -10,6 +10,9 @@ import 'vxe-table/lib/index.css'
 import VXETablePluginElement from 'vxe-table-plugin-element'
 import 'vxe-table-plugin-element/dist/style.css'
 import axios from 'axios'
+const VueCookie = require('vue-cookies');
+// Tell Vue to use the plugin
+Vue.use(VueCookie);
 Vue.config.debug = true;
 Vue.config.productionTip = false;
 
