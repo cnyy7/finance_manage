@@ -78,18 +78,19 @@
             handleSelect(key, keyPath) {
                 switch (key) {
                     case '1-1':
-                        this.$router.push('/home/members');
+                        this.$router.push('/home/member');
                         break;
                     case '1-2':
-                        this.$router.push('/home/savings');
+                        this.$router.push('/home/saving');
                         break;
                     case '1-3':
-                        this.$router.push('/home/balances');
+                        this.$router.push('/home/balance');
                         break;
                     case '1-4':
-                        this.$router.push('/home/members');
-                        break;case '1-5':
-                        this.$router.push('/home/members');
+                        this.$router.push('/home/borrowing');
+                        break;
+                    case '1-5':
+                        this.$router.push('/home/finance');
                         break;
                 }
             },

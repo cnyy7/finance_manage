@@ -139,6 +139,9 @@
 
 
 <style>
+    body {
+        background: white;
+    }
     .login-container {
         width: 350px;
         height: 100%;

@@ -8,12 +8,14 @@ import store from './../store/store'
 import Hello from './../components/Hello'
 import Login from "../components/Login";
 import Home from "../components/Home";
-import members from "../components/members";
+import member from "../components/member";
 import Register from "../components/Register";
-import savings from "../components/savings";
+import saving from "../components/saving";
 import notFound from "../components/notFound";
-import balances from "../components/balances";
+import balance from "../components/balance";
+import finance from "../components/finance";
 import changepwd from "../components/changepwd";
+import borrow from "../components/borrowing";
 import axios from 'axios'
 import sha256 from 'crypto-js/sha256';
 
@@ -54,22 +56,36 @@ var router = new Router({
             },
             children: [
                 {
-                    path: 'members',
-                    component: members,
+                    path: 'member',
+                    component: member,
                     name: '家庭成员管理',
                     meta: {
                         requireAuth: true,
                     },
                 }, {
-                    path: 'savings',
-                    component: savings,
+                    path: 'borrowing',
+                    component: borrow,
+                    name: '借入借出管理',
+                    meta: {
+                        requireAuth: true,
+                    },
+                }, {
+                    path: 'finance',
+                    component: finance,
+                    name: '理财管理',
+                    meta: {
+                        requireAuth: true,
+                    },
+                }, {
+                    path: 'saving',
+                    component: saving,
                     name: '储蓄账户管理',
                     meta: {
                         requireAuth: true,
                     },
                 }, {
-                    path: 'balances',
-                    component: balances,
+                    path: 'balance',
+                    component: balance,
                     name: '日常收支管理',
                     meta: {
                         requireAuth: true,

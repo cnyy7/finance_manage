@@ -1,6 +1,12 @@
 <template>
     <div>
-        <el-button @click="insertRowEvent" type="primary" style="margin-bottom: 5px">添加新储蓄账户</el-button>
+        <el-button @click="insertRowEvent" type="primary" style="margin-bottom: 5px">
+            添加新记录
+        </el-button>
+        <el-button @click="$refs.xTable.exportCsv({filename:'data'+new Date().toLocaleDateString()})" type="primary"
+                   style="margin-bottom: 5px">
+            导出数据
+        </el-button>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -13,16 +19,16 @@
                 :edit-config="{key: 'id', trigger: 'manual', mode: 'row',activeMethod: activeCellMethod}"
                 @edit-disabled="editDisabledEvent">
             <vxe-table-column type="index" width="60"></vxe-table-column>
-            <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'input'}" :disabled="false"></vxe-table-column>-->
+            <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'ElInput'}" :disabled="false"></vxe-table-column>-->
             <vxe-table-column field="bankName" title="银行名" sortable :edit-render="{name: 'ElInput'}"
                               :filters="[{data: ''}]"
                               :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
-            <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'input'}"></vxe-table-column>-->
+            <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'ElInput'}"></vxe-table-column>-->
             <vxe-table-column field="member.id" title="持卡人" sortable
                               :edit-render="{name: 'ElSelect', options: membersList}"></vxe-table-column>
             <vxe-table-column field="cardNumber" title="银行卡号" sortable
-                              :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'input'}"></vxe-table-column>
+                              :edit-render="{name: 'ElInput'}"></vxe-table-column>
+            <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'ElInput'}"></vxe-table-column>
             <vxe-table-column field="beginTime" title="办卡时间" sortable
                               :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
             <vxe-table-column field="updateTime" title="更新时间" sortable
@@ -43,27 +49,37 @@
     </div>
 </template>
 <script>
-    import {mapState} from "vuex";
+    import {mapState, mapActions} from "vuex";
 
     export default {
         data() {
             return {
-                tableData: this.$store.state.savings,
-                membersList: [],
                 loading: true,
             }
         },
-        created() {
+        async created() {
             this.loading = true;
-            this.loadData();
+            let result = await this.loadData({path: this.$route.path});
+            if (!result) {
+                this.errorMessage("数据加载错误");
+            } else {
+                this.successMessage("数据加载成功");
+            }
             this.loading = false;
         },
         methods: {
+            ...mapActions([
+                'loadData',
+                'getType',
+            ]),
             activeCellMethod({column, columnIndex}) {
                 return columnIndex !== 1
             },
             insertRowEvent(row) {
-                let newRow = {};
+                let newRow = {
+                    updateTime: new Date(Date.now()),
+                    beginTime: new Date(Date.now())
+                };
                 this.$refs.xTable.insert(newRow)
                     .then(({row}) => {
                         row.id = undefined;
@@ -79,9 +95,10 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then(() => {
+                }).then(async () => {
                     this.loading = true;
-                    this.$axios.post('/api/remove/Saving', {
+                    let type = await this.getType(this.$route.path);
+                    this.$axios.post('/api/remove/' + type, {
                         data: row,
                     }).then((data) => {
                         if (data.status === 200) {
@@ -90,13 +107,15 @@
                         } else {
                             this.errorMessage("删除失败");
                         }
+                        this.loading = false;
                     });
                 }).catch(() => {
                     this.successMessage("已取消删除");
+                    this.loading = false;
                 });
                 this.loading = false;
             },
-            saveRowEvent(row) {
+            async saveRowEvent(row) {
                 var isInsert = false;
                 if (row.id === undefined) {
                     isInsert = true;
@@ -104,7 +123,8 @@
                 this.loading = true;
                 row.account = this.$store.state.account;
                 // alert(JSON.stringify(row, null, 2));
-                this.$axios.post('/api/save/Saving', {
+                let type = await this.getType(this.$route.path);
+                this.$axios.post('/api/save/' + type, {
                     data: row,
                 }).then((data) => {
                     if (data.status === 200) {
@@ -116,6 +136,7 @@
                         } else {
                             this.successMessage("修改成功");
                         }
+                        this.$refs.xTable.clearActived();
                     } else {
                         this.$refs.xTable.revert(row);
                         if (isInsert) {
@@ -124,8 +145,8 @@
                             this.errorMessage("修改失败");
                         }
                     }
+                    this.loading = false;
                 });
-                this.$refs.xTable.clearActived();
                 this.loading = false;
             },
             cancelRowEvent(row) {
@@ -153,35 +174,20 @@
                     type: 'error'
                 });
             },
-            async loadData() {
-                try {
-                    const savings = await this.$axios.post('/api/getAll/saving', {
-                        id: this.$store.state.account.id
-                    });
-                    this.$store.commit('setSavings', savings.data);
-                    const members = await this.$axios.post('/api/getAll/member', {
-                        id: this.$store.state.account.id
-                    });
-                    this.membersList = members.data.map((e) => {
-                        return {
-                            label: e.name,
-                            value: e.id
-                        }
-                    });
-                } catch (e) {
-                    console.log('数据加载失败: ' + e);
-                }
-            }
+
         },
         computed: mapState([
             // 映射 this.account 为 store.state.account
             'account',
             'savings',
+            'membersList',
         ])
     }
 </script>
 <style>
-
+    body {
+        background: white;
+    }
 </style>
 
 

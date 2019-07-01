@@ -99,7 +99,7 @@ app.post('/api/login', async function (req, res) {
         res.cookie('account', cookieString, {expires: new Date(Date.now() + 1000 * 60 * 10)});
         res.json(account);
     } else {
-        res.status(404).end();
+        res.status(203).end();
     }
 });
 
@@ -111,7 +111,7 @@ app.post('/api/register', async function (req, res) {
         res.status(200).end();
     } catch (e) {
         console.log('error ==> ' + e);
-        res.status(404).end();
+        res.status(203).end();
     }
     // res.json(toJSON(account, 'success'));
 });
@@ -125,7 +125,7 @@ app.post('/api/changepwd', async function (req, res) {
         res.status(200).end();
     } catch (e) {
         console.log('error ==> ' + e);
-        res.status(404).end();
+        res.status(203).end();
     }
 });
 
@@ -145,7 +145,7 @@ app.post('/api/getOne/:type', async function (req, res) {
         console.log('RepositoryType : ' + req.params.type.toLowerCase());
         console.log('Repository : ' + JSON.stringify(req.body.id, null, 2));
         console.log('error ==> ' + e);
-        res.status(404).end();
+        res.status(203).end();
     }
 });
 
@@ -157,7 +157,7 @@ app.post('/api/getAll/:type', async function (req, res) {
                 const accountList = await Repositories.accountRepository.find();
                 res.json(accountList);
             } else {
-                res.status(404).end();
+                res.status(203).end();
             }
         } else {
             let members = await Repositories.memberRepository.find({
@@ -183,7 +183,7 @@ app.post('/api/getAll/:type', async function (req, res) {
         console.log('RepositoryType : ' + req.params.type.toLowerCase());
         console.log('Repository : ' + JSON.stringify(req.body.id, null, 2));
         console.log('error ==> ' + e);
-        res.status(404).end();
+        res.status(203).end();
     }
 });
 
@@ -196,7 +196,7 @@ app.post('/api/save/:type', async function (req, res) {
         console.log('RepositoryType : ' + req.params.type.toLowerCase());
         console.log('Repository : ' + JSON.stringify(req.body.data, null, 2));
         console.log('error ==> ' + e);
-        res.status(404).end();
+        res.status(203).end();
     }
 });
 
@@ -212,7 +212,7 @@ app.post('/api/remove/:type', async function (req, res) {
         console.log('RepositoryType : ' + req.params.type.toLowerCase());
         console.log('Repository : ' + JSON.stringify(req.body.data, null, 2));
         console.log('error ==> ' + e);
-        res.status(404).end();
+        res.status(203).end();
     }
 
 });
