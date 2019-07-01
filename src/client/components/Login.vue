@@ -68,7 +68,7 @@
                         this.$axios.post('/api/login', loginParams)
                             .then((data) => {
                                 // alert(JSON.stringify(data, null, 2));
-                                console.log(JSON.stringify(data, null, 2));
+                                // console.log(JSON.stringify(data, null, 2));
                                 // this.$router.replace('/home');
                                 if (data.status === 200) {
                                     this.$store.commit('setLogin', true);
@@ -100,9 +100,9 @@
                 });
 
                 // alert('account.username: '+this.account.username+'\naccount.pwd: '+this.account.pwd);
-                console.log(text);
-                console.log('account.username: ' + this.account.username);
-                console.log('account.pwd: ' + this.account.pwd);
+                // console.log(text);
+                // console.log('account.username: ' + this.account.username);
+                // console.log('account.pwd: ' + this.account.pwd);
                 return false;
             },
             inputError(text) {
@@ -112,7 +112,7 @@
                     message: '验证码错误请重新输入',
                     type: 'error'
                 });
-                console.log(text);
+                // console.log(text);
                 // console.log('account.username: ' + this.account.username);
                 // console.log('account.pwd: ' + this.account.pwd);
                 return false;

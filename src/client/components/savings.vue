@@ -23,8 +23,10 @@
             <vxe-table-column field="cardNumber" title="银行卡号" sortable
                               :edit-render="{name: 'input'}"></vxe-table-column>
             <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'input'}"></vxe-table-column>
-            <vxe-table-column field="beginTime" title="办卡时间" sortable :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
-            <vxe-table-column field="updateTime" title="更新时间" sortable :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+            <vxe-table-column field="beginTime" title="办卡时间" sortable
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+            <vxe-table-column field="updateTime" title="更新时间" sortable
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
             <vxe-table-column title="操作">
                 <template v-slot="{ row }">
                     <template v-if="$refs.xTable.hasActiveRow(row)">
@@ -61,8 +63,8 @@
                 return columnIndex !== 1
             },
             insertRowEvent(row) {
-                let newMember = {};
-                this.$refs.xTable.insert(newMember)
+                let newRow = {};
+                this.$refs.xTable.insert(newRow)
                     .then(({row}) => {
                         row.id = undefined;
                         this.$refs.xTable.setActiveRow(row)
@@ -73,14 +75,14 @@
                 this.$refs.xTable.setActiveRow(row)
             },
             removeRowEvent(row) {
-                this.$confirm('此操作将永久删除该成员, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     this.loading = true;
                     this.$axios.post('/api/remove/Saving', {
-                        member: row,
+                        data: row,
                     }).then((data) => {
                         if (data.status === 200) {
                             this.$refs.xTable.remove(row);
@@ -89,10 +91,10 @@
                             this.errorMessage("删除失败");
                         }
                     });
-                    this.loading = false;
                 }).catch(() => {
                     this.successMessage("已取消删除");
-                })
+                });
+                this.loading = false;
             },
             saveRowEvent(row) {
                 var isInsert = false;
@@ -114,7 +116,6 @@
                         } else {
                             this.successMessage("修改成功");
                         }
-
                     } else {
                         this.$refs.xTable.revert(row);
                         if (isInsert) {
@@ -152,18 +153,24 @@
                     type: 'error'
                 });
             },
-            loadData() {
-                this.$axios.post('/api/getAll/Saving', {
-                    id: this.$store.state.account.id
-                }).then((data) => {
-                    this.$store.commit('setSavings', data.data);
-                    this.membersList = this.savings.map((e) => {
+            async loadData() {
+                try {
+                    const savings = await this.$axios.post('/api/getAll/saving', {
+                        id: this.$store.state.account.id
+                    });
+                    this.$store.commit('setSavings', savings.data);
+                    const members = await this.$axios.post('/api/getAll/member', {
+                        id: this.$store.state.account.id
+                    });
+                    this.membersList = members.data.map((e) => {
                         return {
-                            label: e.member.name,
-                            value: e.member.id
+                            label: e.name,
+                            value: e.id
                         }
                     });
-                });
+                } catch (e) {
+                    console.log('数据加载失败: ' + e);
+                }
             }
         },
         computed: mapState([

@@ -89,11 +89,18 @@ app.get('/', function (req, res) {
 });
 
 app.post('/api/login', async function (req, res) {
-
     let account = await Repositories.accountRepository.findOne(
         {name: req.body.name}
     );
-    account ? res.json(account) : res.status(404).end();
+    if (account && account.pwd === sha256(req.body.pwd + SALT).toString()) {
+        let cookieString = account.id + '.' + sha256(account.name + SALT)
+            .toString();
+        account.pwd = account.pwd.substring(0, 1);
+        res.cookie('account', cookieString, {expires: new Date(Date.now() + 1000 * 60 * 10)});
+        res.json(account);
+    } else {
+        res.status(404).end();
+    }
 });
 
 app.post('/api/register', async function (req, res) {

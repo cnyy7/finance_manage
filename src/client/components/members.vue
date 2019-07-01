@@ -69,8 +69,8 @@
                 return columnIndex !== 1
             },
             insertRowEvent(row) {
-                let newMember = {};
-                this.$refs.xTable.insert(newMember)
+                let newRow = {};
+                this.$refs.xTable.insert(newRow)
                     .then(({row}) => {
                         row.id = undefined;
                         this.$refs.xTable.setActiveRow(row)
@@ -88,7 +88,7 @@
                 }).then(() => {
                     this.loading = true;
                     this.$axios.post('/api/remove/Member', {
-                        member: row,
+                        data: row,
                     }).then((data) => {
                         if (data.status === 200) {
                             this.$refs.xTable.remove(row);
@@ -97,10 +97,10 @@
                             this.errorMessage("删除失败，可能有与该成员对应的其他项目，请先删除其他项目。");
                         }
                     });
-                    this.loading = false;
                 }).catch(() => {
                     this.successMessage("已取消删除");
-                })
+                });
+                this.loading = false;
             },
             saveRowEvent(row) {
                 var isInsert = false;
