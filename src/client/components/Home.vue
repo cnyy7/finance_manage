@@ -18,26 +18,34 @@
             <el-container>
                 <el-aside style="flex: 0 0 230px;width: 230px;background:#eef1f6">
                     <el-menu default-active="1" class="el-menu-vertical-demo" @select="handleSelect">
-                        <el-menu-item index="1-1">
-                            <i class="el-icon-user"></i>
-                            <span slot="title">家庭成员管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="1-2">
-                            <i class="el-icon-bank-card"></i>
-                            <span slot="title">储蓄账户管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="1-3">
-                            <i class="el-icon-wallet"></i>
-                            <span slot="title">日常收支管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="1-4">
-                            <i class="el-icon-hot-water"></i>
-                            <span slot="title">借入借出管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="1-5">
-                            <i class="el-icon-money"></i>
-                            <span slot="title">理财管理</span>
-                        </el-menu-item>
+                        <div v-if="account.type!=='administrator'">
+                            <el-menu-item index="1-1">
+                                <i class="el-icon-user"></i>
+                                <span slot="title">家庭成员管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-2">
+                                <i class="el-icon-bank-card"></i>
+                                <span slot="title">储蓄账户管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-3">
+                                <i class="el-icon-wallet"></i>
+                                <span slot="title">日常收支管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-4">
+                                <i class="el-icon-hot-water"></i>
+                                <span slot="title">借入借出管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-5">
+                                <i class="el-icon-money"></i>
+                                <span slot="title">理财管理</span>
+                            </el-menu-item>
+                        </div>
+                        <div v-else>
+                            <el-menu-item index="2-1">
+                                <i class="el-icon-user"></i>
+                                <span slot="title">账号管理</span>
+                            </el-menu-item>
+                        </div>
                     </el-menu>
                 </el-aside>
                 <el-main class="home_main">
@@ -91,6 +99,9 @@
                         break;
                     case '1-5':
                         this.$router.push('/home/finance');
+                        break;
+                    case '2-1':
+                        this.$router.push('/home/account');
                         break;
                 }
             },

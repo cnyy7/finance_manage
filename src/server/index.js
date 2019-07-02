@@ -104,8 +104,9 @@ app.post('/api/login', async function (req, res) {
 });
 
 app.post('/api/register', async function (req, res) {
-    const account = new Account(req.body.name, sha256(req.body.pwd + SALT)
-        .toString(), 'normal');
+    let id = req.body.id ? req.body.id : undefined;
+    let type = req.body.type ? req.body.type : 'normal';
+    const account = new Account(req.body.name, sha256(req.body.pwd + SALT).toString(), type, undefined, undefined, id);
     try {
         const newAccount = await Repositories.accountRepository.save(account);
         res.status(200).end();

@@ -1,7 +1,7 @@
 <template>
     <el-form ref="changePwdFrom" :model="account" :rules="rules" label-position="left" label-width="0px"
              class="demo-ruleForm login-container">
-        <h3 class="title">修改密码</h3>
+        <h3 class="change-title">修改密码</h3>
         <el-form-item prop="pwd">
             <el-input type="password" v-model="account.pwd" auto-complete="off" placeholder="请输入新密码"
                       prefix-icon="el-icon-lock" clearable show-password></el-input>
@@ -151,7 +151,7 @@
 
     }
 
-    .title {
+    .change-title {
         text-align: center;
     }
 

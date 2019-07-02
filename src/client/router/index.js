@@ -12,6 +12,7 @@ import member from "../components/member";
 import Register from "../components/Register";
 import saving from "../components/saving";
 import notFound from "../components/notFound";
+import account from "../components/account";
 import balance from "../components/balance";
 import finance from "../components/finance";
 import changepwd from "../components/changepwd";
@@ -59,6 +60,13 @@ var router = new Router({
                     path: 'member',
                     component: member,
                     name: '家庭成员管理',
+                    meta: {
+                        requireAuth: true,
+                    },
+                }, {
+                    path: 'account',
+                    component: account,
+                    name: '账号管理',
                     meta: {
                         requireAuth: true,
                     },
@@ -117,7 +125,13 @@ router.beforeEach((to, from, next) => {
             // 登录就继续
             next();
         } else {
-            let accountString = Vue.cookies.get('account');
+            let accountString = null;
+            try {
+                accountString = Vue.cookies.get('account');
+            } catch (e) {
+                console.log("Vue.cookies.get('account') error: " + e);
+                accountString = null;
+            }
             if (accountString != null) {
                 console.log('has cookie account verifying...');
                 var accountStrings = accountString.split('.');
@@ -149,7 +163,7 @@ router.beforeEach((to, from, next) => {
             }
 
         }
-    } else if (to.path === '/login' && store.state.isLogin) {
+    } else if ((to.path === '/login' || to.path === '/register') && store.state.isLogin) {
 
         // 不需要登录的，可以继续访问
         next({

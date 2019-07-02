@@ -18,6 +18,7 @@ const store = new Vuex.Store({
     state: {
         isLogin: false,
         account: null,
+        accounts: null,
         members: null,
         savings: null,
         balances: null,
@@ -32,6 +33,9 @@ const store = new Vuex.Store({
         },
         setAccount(state, account) {
             state.account = account;
+        },
+        setAccounts(state, accounts) {
+            state.accounts = accounts;
         },
         setMembers(state, members) {
             state.members = members;
@@ -64,7 +68,7 @@ const store = new Vuex.Store({
                 });
                 let saveType = type.toUpperCase()[0] + type.substring(1) + 's';
                 commit('set' + saveType, receiveData.data);
-                if (type !== 'member') {
+                if (type !== 'member' && type !== 'account') {
                     const members = await axios.post('/api/getAll/member', {
                         id: state.account.id
                     });
@@ -82,7 +86,7 @@ const store = new Vuex.Store({
                 return false;
             }
         },
-        async getType(state,path) {
+        async getType({state}, path) {
             path = path.toString();
             if (path.endsWith('/')) {
                 path = path.substring(0, path.length - 1);
