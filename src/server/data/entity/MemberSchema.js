@@ -1,0 +1,57 @@
+const EntitySchema = require("typeorm").EntitySchema;
+const Member = require("../model/Models").Member;
+module.exports = new EntitySchema({
+    name: "Member",
+    target: Member,
+    columns: {
+        id: {
+            primary: true,
+            type: "int",
+            generated: true
+        },
+        name: {
+            type: "varchar",
+        },
+        sex: {
+            type: "varchar",
+        },
+        control: {
+            type: "varchar",
+        },
+        phone: {
+            type: "varchar",
+        },
+        age: {
+            type: "int",
+        },
+    },
+    relations: {
+        account: {
+            type: 'many-to-one',
+            target: 'Account',
+            joinColumn: true,
+            nullable: false,
+            inverseSide: 'members',
+        },
+        savings: {
+            type: 'one-to-many',
+            target: 'Saving',
+            inverseSide: 'member',
+        },
+        balances: {
+            type: 'one-to-many',
+            target: 'Balance',
+            inverseSide: 'member',
+        },
+        borrowings: {
+            type: 'one-to-many',
+            target: 'Borrowing',
+            inverseSide: 'member',
+        },
+        finances: {
+            type: 'one-to-many',
+            target: 'Finance',
+            inverseSide: 'member',
+        },
+    }
+});

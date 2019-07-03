@@ -4,33 +4,48 @@
             <el-header class="yellowheader">
                 <el-image class="el-logo" src="/static/logo.png" fit="scale-down"></el-image>
                 <h2 class="headlogo">{{project_name}}</h2>
-                <el-col :span="3" class="userinfo">
-                    <el-dropdown>
+                <el-col :span="2" class="userinfo">
+                    <el-dropdown @command="handleCommand">
                         <i class="el-icon-setting" style="margin-right: 15px"></i>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item>查看</el-dropdown-item>
-                            <el-dropdown-item>新增</el-dropdown-item>
-                            <el-dropdown-item>删除</el-dropdown-item>
+                            <el-dropdown-item command="changepwd">修改密码</el-dropdown-item>
+                            <el-dropdown-item command="logout" style="color: red">注销</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
-                    <span>{{username}}</span>
+                    <span>{{account.name}}</span>
                 </el-col>
             </el-header>
             <el-container>
                 <el-aside style="flex: 0 0 230px;width: 230px;background:#eef1f6">
                     <el-menu default-active="1" class="el-menu-vertical-demo" @select="handleSelect">
-                        <el-submenu index="1">
-                            <template slot="title"><i class="el-icon-message"></i>管理系统</template>
-                            <el-menu-item index="1-1">列表管理</el-menu-item>
-                            <el-menu-item index="1-2">表单管理</el-menu-item>
-                        </el-submenu>
-                    </el-menu>
-                    <el-menu default-active="2" class="el-menu-vertical-demo" @select="handleSelect">
-                        <el-submenu index="2">
-                            <template slot="title"><i class="el-icon-message"></i>管理系统</template>
-                            <el-menu-item index="2-1">列表管理</el-menu-item>
-                            <el-menu-item index="2-2">表单管理</el-menu-item>
-                        </el-submenu>
+                        <div v-if="account.type!=='administrator'">
+                            <el-menu-item index="1-1">
+                                <i class="el-icon-user"></i>
+                                <span slot="title">家庭成员管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-2">
+                                <i class="el-icon-bank-card"></i>
+                                <span slot="title">储蓄账户管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-3">
+                                <i class="el-icon-wallet"></i>
+                                <span slot="title">日常收支管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-4">
+                                <i class="el-icon-hot-water"></i>
+                                <span slot="title">借入借出管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="1-5">
+                                <i class="el-icon-money"></i>
+                                <span slot="title">理财管理</span>
+                            </el-menu-item>
+                        </div>
+                        <div v-else>
+                            <el-menu-item index="2-1">
+                                <i class="el-icon-user"></i>
+                                <span slot="title">账号管理</span>
+                            </el-menu-item>
+                        </div>
                     </el-menu>
                 </el-aside>
                 <el-main class="home_main">
@@ -54,12 +69,14 @@
 </template>
 
 <script>
+    import {mapState} from 'vuex';
+
     export default {
         data() {
             return {
                 searchCriteria: '',
-                project_name:'财务管理系统',
-                username:'鸭鸭',
+                project_name: '财务管理系统',
+                username: '鸭鸭',
             }
         },
         methods: {
@@ -69,22 +86,57 @@
             handleSelect(key, keyPath) {
                 switch (key) {
                     case '1-1':
-                        this.$router.push('/product');
+                        this.$router.push('/home/member');
                         break;
                     case '1-2':
-                        this.$router.push('/forms');
+                        this.$router.push('/home/saving');
+                        break;
+                    case '1-3':
+                        this.$router.push('/home/balance');
+                        break;
+                    case '1-4':
+                        this.$router.push('/home/borrowing');
+                        break;
+                    case '1-5':
+                        this.$router.push('/home/finance');
                         break;
                     case '2-1':
-                        this.$router.push('/strategy');
+                        this.$router.push('/home/account');
                         break;
                 }
             },
+            handleCommand(command) {
+                if (command === 'logout') {
+                    this.$axios.post('/api/logout', {}).then((data) => {
+                        if (data.status === 200) {
+                            this.$store.commit('setLogin', false);
+                            this.$message({
+                                message: '注销成功',
+                                type: 'success'
+                            });
+                            this.$router.push('/login');
+                        }
+                    }).catch((err) => {
+                        console.log(err);
+                    })
+                } else if (command === 'changepwd') {
+                    this.$router.push('/home/changepwd');
+                }
+            }
         },
+        computed: mapState([
+            // 映射 this.account 为 store.state.account
+            'account'
+        ])
     }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    body {
+        background: white;
+    }
+
     .con_section {
         position: absolute;
         top: 0px;
@@ -98,7 +150,7 @@
         line-height: 60px;
         background: #ECBB17;
         color: #000;
-        font-family: "Microsoft YaHei",serif;
+        font-family: "Microsoft YaHei", serif;
     }
 
     .el-menu-item.is-active {
