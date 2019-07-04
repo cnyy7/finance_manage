@@ -193,6 +193,7 @@ app.post('/api/save/:type', async function (req, res) {
     try {
         const data = await Repositories[req.params.type.toLowerCase() + RepositoryString].save(req.body.data);
         res.json(data);
+        console.log(JSON.stringify(data,null,2));
     } catch (e) {
         console.log('RepositoryType : ' + req.params.type.toLowerCase());
         console.log('Repository : ' + JSON.stringify(req.body.data, null, 2));

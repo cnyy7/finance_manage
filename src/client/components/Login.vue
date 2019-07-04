@@ -10,7 +10,7 @@
             <el-input type="password" v-model="account.pwd" auto-complete="off" placeholder="密码"
                       prefix-icon="el-icon-lock" clearable show-password></el-input>
         </el-form-item>
-        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false"
+        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false" :code-length="4"
                 ref="Verify"></Verify>
         <!--        <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
         <el-form-item>

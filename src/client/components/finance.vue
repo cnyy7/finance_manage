@@ -7,6 +7,14 @@
                    style="margin-bottom: 5px">
             导出数据
         </el-button>
+        <el-button @click="showDataDialog=!showDataDialog" type="primary" style="margin-bottom: 5px">
+            展示数据汇总
+        </el-button>
+        <el-dialog :visible.sync="showDataDialog" :title="'数据展示'">
+            <figure>
+                <ve-pie :data="chartData" :settings="chartSettings"></ve-pie>
+            </figure>
+        </el-dialog>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -57,6 +65,12 @@
         data() {
             return {
                 loading: true,
+                showDataDialog: false,
+                chartSettings: {
+                    // roseType: 'radius',
+                    limitShowNum: 5
+                },
+                copyTableData: [],
             }
         },
         async created() {
@@ -68,15 +82,20 @@
                 this.successMessage("数据加载成功");
             }
             this.loading = false;
-        },
+            this.copyTableData = this.finances;
+            // alert(JSON.stringify(this.copyTableData,null,2));
+        }
+        ,
         methods: {
-            ...mapActions([
-                'loadData',
-                'getType',
-            ]),
+            ...
+                mapActions([
+                    'loadData',
+                    'getType',
+                ]),
             activeCellMethod({column, columnIndex}) {
                 return columnIndex !== 1
-            },
+            }
+            ,
             insertRowEvent(row) {
                 let newRow = {
                     updateTime: new Date(Date.now()),
@@ -88,10 +107,14 @@
                         this.$refs.xTable.setActiveRow(row)
                     });
                 // alert(JSON.stringify(row,null,2));
-            },
+            }
+            ,
             editRowEvent(row) {
+                // alert(JSON.stringify(this.$refs.xTable.tableData));
+
                 this.$refs.xTable.setActiveRow(row)
-            },
+            }
+            ,
             removeRowEvent(row) {
                 this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -116,7 +139,8 @@
                     this.loading = false;
                 });
                 this.loading = false;
-            },
+            }
+            ,
             async saveRowEvent(row) {
                 var isInsert = false;
                 if (row.id === undefined) {
@@ -148,48 +172,85 @@
                         }
                     }
                     this.loading = false;
+                    // alert(JSON.stringify(row,null,2));
+                    this.copyTableData = this.$refs.xTable.tableData;
                 });
                 this.loading = false;
-            },
+            }
+            ,
             cancelRowEvent(row) {
                 this.$refs.xTable.revert(row);
                 this.$refs.xTable.clearActived();
-            },
-            editDisabledEvent({row, column}) {
+            }
+            ,
+            editDisabledEvent({
+                                  row,
+                                  column
+                              }) {
                 this.$message({
                     showClose: true,
                     message: '禁止编辑',
                     type: 'waring'
                 });
-            },
+            }
+            ,
             successMessage(message) {
                 this.$message({
                     showClose: true,
                     message: message,
                     type: 'success'
                 });
-            },
+            }
+            ,
             errorMessage(message) {
                 this.$message({
                     showClose: true,
                     message: message,
                     type: 'error'
                 });
-            },
+            }
+            ,
 
-        },
-        computed: mapState([
-            // 映射 this.account 为 store.state.account
-            'account',
-            'finances',
-            'membersList',
-        ])
+        }
+        ,
+        computed: {
+            ...mapState([
+                // 映射 this.account 为 store.state.account
+                'account',
+                'finances',
+                'membersList',
+            ]),
+            chartData() {
+                return {
+                    columns: ['用户', '金额'],
+                    rows: this.copyTableData.map((a) => ({
+                        '用户': this.membersList.find((x) => {
+                            return x.value === a.member.id
+                        }).label,
+                        '金额': a.money
+                    }))
+
+                }
+            }
+        }
     }
 </script>
 <style>
     body {
         background: white;
     }
+
+    /*figure {*/
+    /*    display: inline-block;*/
+    /*    position: relative;*/
+    /*    margin: 2em auto;*/
+    /*    border: 1px solid rgba(0, 0, 0, .1);*/
+    /*    border-radius: 8px;*/
+    /*    box-shadow: 0 0 45px rgba(0, 0, 0, .2);*/
+    /*    padding: 1.5em 2em;*/
+    /*    min-width: calc(40vw + 4em);*/
+    /*}*/
+
 </style>
 
 
