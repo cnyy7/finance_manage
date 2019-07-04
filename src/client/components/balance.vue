@@ -7,6 +7,14 @@
                    style="margin-bottom: 5px">
             导出数据
         </el-button>
+        <el-button @click="showDataDialog=!showDataDialog" type="primary" style="margin-bottom: 5px">
+            展示数据汇总
+        </el-button>
+        <el-dialog :visible.sync="showDataDialog" :title="'数据展示'">
+            <figure>
+                <mychart :table-data="this.copyTableData" :limit-show-number="5"></mychart>
+            </figure>
+        </el-dialog>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -51,11 +59,17 @@
 </template>
 <script>
     import {mapActions, mapState} from "vuex";
+    import mychart from "./mychart"
 
     export default {
+        components: {
+            mychart
+        },
         data() {
             return {
                 loading: true,
+                showDataDialog: false,
+                copyTableData: [],
             }
         },
         async created() {
@@ -67,6 +81,7 @@
                 this.successMessage("数据加载成功");
             }
             this.loading = false;
+            this.copyTableData = this.balances;
         },
         methods: {
             ...mapActions([
@@ -144,6 +159,7 @@
                         }
                     }
                     this.loading = false;
+                    this.copyTableData = this.$refs.xTable.tableData;
                 });
                 this.loading = false;
             },
@@ -173,12 +189,14 @@
                 });
             },
         },
-        computed: mapState([
-            // 映射 this.account 为 store.state.account
-            'account',
-            'balances',
-            'membersList',
-        ])
+        computed: {
+            ...mapState([
+                // 映射 this.account 为 store.state.account
+                'account',
+                'balances',
+                'membersList',
+            ]),
+        }
     }
 </script>
 <style>

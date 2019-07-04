@@ -12,7 +12,7 @@
         </el-button>
         <el-dialog :visible.sync="showDataDialog" :title="'数据展示'">
             <figure>
-                <ve-pie :data="chartData" :settings="chartSettings"></ve-pie>
+                <mychart :tableData="this.copyTableData" :limit-show-number="5"></mychart>
             </figure>
         </el-dialog>
         <vxe-table
@@ -60,16 +60,16 @@
 </template>
 <script>
     import {mapState, mapActions} from "vuex";
+    import mychart from "./mychart"
 
     export default {
+        components: {
+            mychart
+        },
         data() {
             return {
                 loading: true,
                 showDataDialog: false,
-                chartSettings: {
-                    // roseType: 'radius',
-                    limitShowNum: 5
-                },
                 copyTableData: [],
             }
         },
@@ -87,11 +87,10 @@
         }
         ,
         methods: {
-            ...
-                mapActions([
-                    'loadData',
-                    'getType',
-                ]),
+            ...mapActions([
+                'loadData',
+                'getType',
+            ]),
             activeCellMethod({column, columnIndex}) {
                 return columnIndex !== 1
             }
@@ -220,18 +219,6 @@
                 'finances',
                 'membersList',
             ]),
-            chartData() {
-                return {
-                    columns: ['用户', '金额'],
-                    rows: this.copyTableData.map((a) => ({
-                        '用户': this.membersList.find((x) => {
-                            return x.value === a.member.id
-                        }).label,
-                        '金额': a.money
-                    }))
-
-                }
-            }
         }
     }
 </script>
