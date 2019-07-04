@@ -5,7 +5,6 @@ import Router from 'vue-router'
 import store from './../store/store'
 
 // 导入相应的子组件
-import Hello from './../components/Hello'
 import Login from "../components/Login";
 import Home from "../components/Home";
 import member from "../components/member";
@@ -33,11 +32,7 @@ var router = new Router({
                 requireAuth: true,
             },
             component: Home
-        }, {
-            name: 'hello',
-            path: '/hello',
-            component: Hello
-        },
+        }, 
         {
             name: 'login',
             path: '/login',
