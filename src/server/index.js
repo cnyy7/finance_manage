@@ -11,7 +11,7 @@ import {Account, Member, Saving, Finance, Borrowing, Balance} from './data/model
 
 import {createConnection, getRepository, In} from 'typeorm'
 import sha256 from 'crypto-js/sha256';
-
+import sqlOptions from './data/sqlOptions'
 const SALT = 'c@QSK2*fpav939#F';
 // 正式环境时，下面两个模块不需要引入
 import webpackDevMiddleware from 'webpack-dev-middleware'
@@ -29,24 +29,7 @@ let Repositories = {
     financeRepository: null,
 };
 const RepositoryString = 'Repository';
-createConnection({
-    type: 'mysql', // 数据库类型
-    host: '127.0.0.1', // 数据库地址
-    port: 3306, // 数据库端口号
-    username: 'root', // 数据库用户名
-    password: 'NLP666', // 密码
-    database: 'finance', // 数据库名
-    entities: [
-        require("./data/entity/AccountSchema"),
-        require("./data/entity/MemberSchema"),
-        require("./data/entity/SavingSchema"),
-        require("./data/entity/BalanceSchema"),
-        require("./data/entity/BorrowingSchema"),
-        require("./data/entity/FinanceSchema"),
-    ], // 引入实体
-    synchronize: true,
-}).then(async (connection) => {
-    // let account = new Account('fafsddsdsssdfas', 'fasd', 'adsf');
+createConnection(sqlOptions).then(async (connection) => {
     Repositories.accountRepository = getRepository(Account);
     Repositories.memberRepository = getRepository(Member);
     Repositories.savingRepository = getRepository(Saving);
@@ -193,7 +176,7 @@ app.post('/api/save/:type', async function (req, res) {
     try {
         const data = await Repositories[req.params.type.toLowerCase() + RepositoryString].save(req.body.data);
         res.json(data);
-        console.log(JSON.stringify(data,null,2));
+        // console.log(JSON.stringify(data,null,2));
     } catch (e) {
         console.log('RepositoryType : ' + req.params.type.toLowerCase());
         console.log('Repository : ' + JSON.stringify(req.body.data, null, 2));

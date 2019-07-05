@@ -4,6 +4,10 @@ import createLogger from 'vuex/dist/logger'
 import createPersistedState from "vuex-persistedstate"
 import axios from 'axios'
 
+const debug = process.env.NODE_ENV !== 'production';
+const PersistedState = createPersistedState({
+    storage: window.sessionStorage
+});
 Vue.use(Vuex);
 const logger = createLogger({
     collapsed: false, // 自动展开记录的 mutation
@@ -94,15 +98,7 @@ const store = new Vuex.Store({
             return path.split('/').slice(-1).toString();
         }
     },
-    plugins: [
-        logger,
-        // createVuexAlong({
-        //     session: true,
-        // }),
-        createPersistedState({
-            storage: window.sessionStorage
-        })
-    ],
+    plugins: debug ? [logger, PersistedState,] : [PersistedState],
 });
 
 
