@@ -24,7 +24,7 @@
                 </el-option>
             </el-select>
         </el-form-item>
-        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false"
+        <Verify @success="inputSuccess('success')" @error="inputError('error')" :type="1" :show-button="false" :code-length="4"
                 ref="VerifyRegister"></Verify>
         <!--        <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
         <el-form-item>

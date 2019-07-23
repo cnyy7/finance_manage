@@ -5,7 +5,6 @@ import Router from 'vue-router'
 import store from './../store/store'
 
 // 导入相应的子组件
-import Hello from './../components/Hello'
 import Login from "../components/Login";
 import Home from "../components/Home";
 import member from "../components/member";
@@ -33,10 +32,6 @@ var router = new Router({
                 requireAuth: true,
             },
             component: Home
-        }, {
-            name: 'hello',
-            path: '/hello',
-            component: Hello
         },
         {
             name: 'login',
@@ -123,7 +118,17 @@ router.beforeEach((to, from, next) => {
         // 下面这个判断是自行实现到底是否有没有登录
         if (store.state.isLogin) {
             // 登录就继续
-            next();
+            if (to.path === '/home/account') {
+                if (store.state.account.type === 'administrator') {
+                    next();
+                } else {
+                    next({
+                        path: '/404',
+                    });
+                }
+            } else {
+                next();
+            }
         } else {
             let accountString = null;
             try {
@@ -145,7 +150,18 @@ router.beforeEach((to, from, next) => {
                         console.log('cookie 验证成功');
                         store.commit('setLogin', true);
                         store.commit('setAccount', account);
-                        next();
+
+                        if (to.path === '/home/account') {
+                            if (account.type === 'administrator') {
+                                next();
+                            } else {
+                                next({
+                                    path: '/404',
+                                });
+                            }
+                        } else {
+                            next();
+                        }
                     } else {
                         console.log('cookie 验证失败');
                         next({

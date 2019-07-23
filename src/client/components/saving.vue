@@ -22,17 +22,22 @@
             <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'ElInput'}" :disabled="false"></vxe-table-column>-->
             <vxe-table-column field="bankName" title="银行名" sortable :edit-render="{name: 'ElInput'}"
                               :filters="[{data: ''}]"
-                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
-            <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'ElInput'}"></vxe-table-column>-->
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入银行名'}}"></vxe-table-column>
             <vxe-table-column field="member.id" title="持卡人" sortable
                               :edit-render="{name: 'ElSelect', options: membersList}"></vxe-table-column>
             <vxe-table-column field="cardNumber" title="银行卡号" sortable
-                              :edit-render="{name: 'ElInput'}"></vxe-table-column>
-            <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'ElInput'}"></vxe-table-column>
+                              :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入银行卡号'}}"></vxe-table-column>
+            <vxe-table-column field="phone" title="电话" sortable :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入电话'}}"></vxe-table-column>
             <vxe-table-column field="beginTime" title="办卡时间" sortable
-                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"
+                              :filters="[{data: []}]"
+                              :filter-render="{name: 'ElDatePicker', props: {type: 'daterange', rangeSeparator: '至', startPlaceholder: '开始日期', endPlaceholder: '结束日期'}}"></vxe-table-column>
             <vxe-table-column field="updateTime" title="更新时间" sortable
-                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"
+                              :filters="[{data: []}]"
+                              :filter-render="{name: 'ElDatePicker', props: {type: 'daterange', rangeSeparator: '至', startPlaceholder: '开始日期', endPlaceholder: '结束日期'}}"></vxe-table-column>
             <vxe-table-column title="操作">
                 <template v-slot="{ row }">
                     <template v-if="$refs.xTable.hasActiveRow(row)">

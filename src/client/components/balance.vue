@@ -7,6 +7,14 @@
                    style="margin-bottom: 5px">
             导出数据
         </el-button>
+        <el-button @click="showDataDialog=!showDataDialog" type="primary" style="margin-bottom: 5px">
+            展示数据汇总
+        </el-button>
+        <el-dialog :visible.sync="showDataDialog" :title="'数据展示'">
+            <figure>
+                <mychart :table-data="this.copyTableData" :limit-show-number="5"></mychart>
+            </figure>
+        </el-dialog>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -23,17 +31,21 @@
             <vxe-table-column field="type" title="类型" sortable :edit-render="{name: 'ElInput'}"
                               :filters="[{data: ''}]"
                               :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
-            <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'ElInput'}"></vxe-table-column>-->
             <vxe-table-column field="member.id" title="消费人" sortable
                               :edit-render="{name: 'ElSelect', options: membersList}"></vxe-table-column>
             <vxe-table-column field="money" title="流水金额" sortable :filters="[{data: 0}]"
                               :filter-render="{name: 'ElInputNumber', props: {min: 0}}"
                               :edit-render="{name: 'ElInputNumber', props: { precision:2, step: 0.1, min: 0,size:'small'}}"></vxe-table-column>
             <vxe-table-column field="transFrom" title="流水来源" sortable
-                              :edit-render="{name: 'ElInput'}"></vxe-table-column>
-            <vxe-table-column field="transTo" title="流水去向" sortable :edit-render="{name: 'ElInput'}"></vxe-table-column>
+                              :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入流水来源'}}"></vxe-table-column>
+            <vxe-table-column field="transTo" title="流水去向" sortable :edit-render="{name: 'ElInput'}"
+                              :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入流水去向'}}"></vxe-table-column>
             <vxe-table-column field="datetime" title="时间" sortable
-                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"
+                              :filters="[{data: []}]"
+                              :filter-render="{name: 'ElDatePicker', props: {type: 'daterange', rangeSeparator: '至', startPlaceholder: '开始日期', endPlaceholder: '结束日期'}}"></vxe-table-column>
             <vxe-table-column title="操作">
                 <template v-slot="{ row }">
                     <template v-if="$refs.xTable.hasActiveRow(row)">
@@ -51,11 +63,17 @@
 </template>
 <script>
     import {mapActions, mapState} from "vuex";
+    import mychart from "./mychart"
 
     export default {
+        components: {
+            mychart
+        },
         data() {
             return {
                 loading: true,
+                showDataDialog: false,
+                copyTableData: [],
             }
         },
         async created() {
@@ -67,6 +85,7 @@
                 this.successMessage("数据加载成功");
             }
             this.loading = false;
+            this.copyTableData = this.balances;
         },
         methods: {
             ...mapActions([
@@ -144,6 +163,7 @@
                         }
                     }
                     this.loading = false;
+                    this.copyTableData = this.$refs.xTable.tableData;
                 });
                 this.loading = false;
             },
@@ -173,12 +193,14 @@
                 });
             },
         },
-        computed: mapState([
-            // 映射 this.account 为 store.state.account
-            'account',
-            'balances',
-            'membersList',
-        ])
+        computed: {
+            ...mapState([
+                // 映射 this.account 为 store.state.account
+                'account',
+                'balances',
+                'membersList',
+            ]),
+        }
     }
 </script>
 <style>

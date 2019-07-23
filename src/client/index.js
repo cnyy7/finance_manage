@@ -10,6 +10,8 @@ import 'vxe-table/lib/index.css'
 import VXETablePluginElement from 'vxe-table-plugin-element'
 import 'vxe-table-plugin-element/dist/style.css'
 import axios from 'axios'
+import VePie from 'v-charts/lib/pie.common'
+Vue.component(VePie.name, VePie);
 const VueCookie = require('vue-cookies');
 // Tell Vue to use the plugin
 Vue.use(VueCookie);

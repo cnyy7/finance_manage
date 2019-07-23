@@ -7,6 +7,14 @@
                    style="margin-bottom: 5px">
             导出数据
         </el-button>
+        <el-button @click="showDataDialog=!showDataDialog" type="primary" style="margin-bottom: 5px">
+            展示数据汇总
+        </el-button>
+        <el-dialog :visible.sync="showDataDialog" :title="'数据展示'">
+            <figure>
+                <mychart :tableData="this.copyTableData" :limit-show-number="5"></mychart>
+            </figure>
+        </el-dialog>
         <vxe-table
                 ref="xTable"
                 highlight-hover-row
@@ -21,18 +29,24 @@
             <vxe-table-column type="index" width="60"></vxe-table-column>
             <!--            <vxe-table-column prop="id" label="#" :edit-render="{name: 'input'}" :disabled="false"></vxe-table-column>-->
             <vxe-table-column field="name" title="理财名" sortable
-                              :edit-render="{name: 'ElInput'}"></vxe-table-column>
+                              :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
             <vxe-table-column field="type" title="类型" sortable
-                              :edit-render="{name: 'ElInput'}"></vxe-table-column>
+                              :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
             <vxe-table-column field="member.id" title="所属人" sortable
                               :edit-render="{name: 'ElSelect', options: membersList}"></vxe-table-column>
             <vxe-table-column field="money" title="金额" sortable :filters="[{data: 0}]"
                               :filter-render="{name: 'ElInputNumber', props: {min: 0}}"
                               :edit-render="{name: 'ElInputNumber', props: { precision:2, step: 0.1, min: 0,size:'small'}}"></vxe-table-column>
             <vxe-table-column field="beginTime" title="时间" sortable
-                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"
+                              :filters="[{data: []}]"
+                              :filter-render="{name: 'ElDatePicker', props: {type: 'daterange', rangeSeparator: '至', startPlaceholder: '开始日期', endPlaceholder: '结束日期'}}"></vxe-table-column>
             <vxe-table-column field="updateTime" title="更新时间" sortable
-                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"
+                              :filters="[{data: []}]"
+                              :filter-render="{name: 'ElDatePicker', props: {type: 'daterange', rangeSeparator: '至', startPlaceholder: '开始日期', endPlaceholder: '结束日期'}}"></vxe-table-column>
             <vxe-table-column field="memos" title="备注" sortable
                               :edit-render="{name: 'ElInput'}"></vxe-table-column>
             <vxe-table-column title="操作">
@@ -52,11 +66,17 @@
 </template>
 <script>
     import {mapState, mapActions} from "vuex";
+    import mychart from "./mychart"
 
     export default {
+        components: {
+            mychart
+        },
         data() {
             return {
                 loading: true,
+                showDataDialog: false,
+                copyTableData: [],
             }
         },
         async created() {
@@ -68,7 +88,10 @@
                 this.successMessage("数据加载成功");
             }
             this.loading = false;
-        },
+            this.copyTableData = this.finances;
+            // alert(JSON.stringify(this.copyTableData,null,2));
+        }
+        ,
         methods: {
             ...mapActions([
                 'loadData',
@@ -76,7 +99,8 @@
             ]),
             activeCellMethod({column, columnIndex}) {
                 return columnIndex !== 1
-            },
+            }
+            ,
             insertRowEvent(row) {
                 let newRow = {
                     updateTime: new Date(Date.now()),
@@ -88,10 +112,14 @@
                         this.$refs.xTable.setActiveRow(row)
                     });
                 // alert(JSON.stringify(row,null,2));
-            },
+            }
+            ,
             editRowEvent(row) {
+                // alert(JSON.stringify(this.$refs.xTable.tableData));
+
                 this.$refs.xTable.setActiveRow(row)
-            },
+            }
+            ,
             removeRowEvent(row) {
                 this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -116,7 +144,8 @@
                     this.loading = false;
                 });
                 this.loading = false;
-            },
+            }
+            ,
             async saveRowEvent(row) {
                 var isInsert = false;
                 if (row.id === undefined) {
@@ -148,48 +177,62 @@
                         }
                     }
                     this.loading = false;
+                    // alert(JSON.stringify(row,null,2));
+                    this.copyTableData = this.$refs.xTable.tableData;
                 });
                 this.loading = false;
-            },
+            }
+            ,
             cancelRowEvent(row) {
                 this.$refs.xTable.revert(row);
                 this.$refs.xTable.clearActived();
-            },
-            editDisabledEvent({row, column}) {
+            }
+            ,
+            editDisabledEvent({
+                                  row,
+                                  column
+                              }) {
                 this.$message({
                     showClose: true,
                     message: '禁止编辑',
                     type: 'waring'
                 });
-            },
+            }
+            ,
             successMessage(message) {
                 this.$message({
                     showClose: true,
                     message: message,
                     type: 'success'
                 });
-            },
+            }
+            ,
             errorMessage(message) {
                 this.$message({
                     showClose: true,
                     message: message,
                     type: 'error'
                 });
-            },
+            }
+            ,
 
-        },
-        computed: mapState([
-            // 映射 this.account 为 store.state.account
-            'account',
-            'finances',
-            'membersList',
-        ])
+        }
+        ,
+        computed: {
+            ...mapState([
+                // 映射 this.account 为 store.state.account
+                'account',
+                'finances',
+                'membersList',
+            ]),
+        }
     }
 </script>
 <style>
     body {
         background: white;
     }
+
 </style>
 
 

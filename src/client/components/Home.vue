@@ -17,7 +17,7 @@
             </el-header>
             <el-container>
                 <el-aside style="flex: 0 0 230px;width: 230px;background:#eef1f6">
-                    <el-menu default-active="1" class="el-menu-vertical-demo" @select="handleSelect">
+                    <el-menu default-active="1-1" class="el-menu-vertical-demo" @select="handleSelect">
                         <div v-if="account.type!=='administrator'">
                             <el-menu-item index="1-1">
                                 <i class="el-icon-user"></i>
@@ -77,6 +77,13 @@
                 searchCriteria: '',
                 project_name: '财务管理系统',
                 username: '鸭鸭',
+            }
+        },
+        created() {
+            if (this.account.type === 'administrator') {
+                this.$router.push('/home/account');
+            } else {
+                this.$router.push('/home/member');
             }
         },
         methods: {
