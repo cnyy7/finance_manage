@@ -8,7 +8,8 @@
             导出数据
         </el-button>
         <el-dialog :visible.sync="showRegisterDialog">
-            <Register ref="addAccount" @setShowRegisterDialog="setShowRegisterDialog" :not-add-account="false" :f-message-up="'请输入账号相关信息'" :f-message-down="'添加账号'" :type-options="typeList">
+            <Register ref="addAccount" @setShowRegisterDialog="setShowRegisterDialog" :not-add-account="false"
+                      :f-message-up="'请输入账号相关信息'" :f-message-down="'添加账号'" :type-options="typeList">
 
             </Register>
         </el-dialog>
@@ -25,7 +26,7 @@
                 @edit-disabled="editDisabledEvent">
             <vxe-table-column type="index" width="60"></vxe-table-column>
             <vxe-table-column field="name" title="用户名" sortable :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
-                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入用户名'}}"></vxe-table-column>
             <vxe-table-column field="type" title="类型" sortable
                               :edit-render="{name: 'ElSelect', options: typeList}"></vxe-table-column>
             <vxe-table-column title="操作">

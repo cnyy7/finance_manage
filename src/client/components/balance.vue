@@ -31,17 +31,21 @@
             <vxe-table-column field="type" title="类型" sortable :edit-render="{name: 'ElInput'}"
                               :filters="[{data: ''}]"
                               :filter-render="{name: 'ElInput', props: {placeholder: '请输入姓名'}}"></vxe-table-column>
-            <!--            <vxe-table-column prop="sex" label="性别" :edit-render="{name: 'ElInput'}"></vxe-table-column>-->
             <vxe-table-column field="member.id" title="消费人" sortable
                               :edit-render="{name: 'ElSelect', options: membersList}"></vxe-table-column>
             <vxe-table-column field="money" title="流水金额" sortable :filters="[{data: 0}]"
                               :filter-render="{name: 'ElInputNumber', props: {min: 0}}"
                               :edit-render="{name: 'ElInputNumber', props: { precision:2, step: 0.1, min: 0,size:'small'}}"></vxe-table-column>
             <vxe-table-column field="transFrom" title="流水来源" sortable
-                              :edit-render="{name: 'ElInput'}"></vxe-table-column>
-            <vxe-table-column field="transTo" title="流水去向" sortable :edit-render="{name: 'ElInput'}"></vxe-table-column>
+                              :edit-render="{name: 'ElInput'}" :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入流水来源'}}"></vxe-table-column>
+            <vxe-table-column field="transTo" title="流水去向" sortable :edit-render="{name: 'ElInput'}"
+                              :filters="[{data: ''}]"
+                              :filter-render="{name: 'ElInput', props: {placeholder: '请输入流水去向'}}"></vxe-table-column>
             <vxe-table-column field="datetime" title="时间" sortable
-                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"></vxe-table-column>
+                              :edit-render="{name: 'ElDatePicker', props: {type: 'datetime', format: 'yyyy-MM-dd HH:mm:ss'}}"
+                              :filters="[{data: []}]"
+                              :filter-render="{name: 'ElDatePicker', props: {type: 'daterange', rangeSeparator: '至', startPlaceholder: '开始日期', endPlaceholder: '结束日期'}}"></vxe-table-column>
             <vxe-table-column title="操作">
                 <template v-slot="{ row }">
                     <template v-if="$refs.xTable.hasActiveRow(row)">
