@@ -1,6 +1,6 @@
-- ## 使用[Vue + Express 前后端脚手架](https://github.com/wangqingkai/vue-express-temp)开发
+## 使用[Vue + Express 前后端脚手架](https://github.com/wangqingkai/vue-express-temp)开发
 
-  ## 关键词
+## 关键词
 
   - Vue (vue-router + vuex)
   - Express
@@ -62,6 +62,6 @@
   
      `npm run build`
 
-  ## 截图
+## 截图
 
   ![1566790840174](https://raw.githubusercontent.com/cnyy7/finance_manage/master/preview.png)
