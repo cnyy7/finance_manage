@@ -7,7 +7,7 @@
   - Nodemon
   - Webpack
   - Npm
-- SPA
+  - SPA
   
 ## 文件目录
 
