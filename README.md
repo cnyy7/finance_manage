@@ -7,8 +7,9 @@
   - Nodemon
   - Webpack
   - Npm
-
-  ## 文件目录
+- SPA
+  
+## 文件目录
 
   ```
   .
@@ -47,16 +48,20 @@
        └── prod.env.js
   ```
 
-  ## 用法
+## 用法
 
-  1. 安装依赖包
-
-     `npm install`
-
-  2. 运行开发环境
-
-     `npm run dev 或者 npm start` 
-
-  3. build前端代码
-
+1. 安装依赖包
+  
+   `npm install`
+  
+2. 运行开发环境
+  
+   `npm run dev 或者 npm start` 
+  
+3. build前端代码
+  
      `npm run build`
+
+  ## 截图
+
+  ![1566790840174](https://raw.githubusercontent.com/cnyy7/finance_manage/master/preview.png)
